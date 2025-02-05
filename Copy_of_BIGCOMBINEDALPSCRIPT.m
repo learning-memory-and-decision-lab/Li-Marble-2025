@@ -77,7 +77,7 @@ addpath(genpath(basePath))
 dirs.basePath = basePath;
 dirs.eyeDir = eyeDir;
 dirs.behaveDir = behaveDir;
-dirs.smuPath = smuPath;
+% dirs.smuPath = smuPath;
 dirs.eegDir = eegDir;
 dirs.figDir = figDir;
 
@@ -99,19 +99,6 @@ eyeSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 20
         2069 2070 2071 2073 2074 2075 2079 2080 2081 2082 2083 2084 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2103 2104 2105 2106];
 behaveSubs = [20280 2030 2031 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 ...
         2066 2068 2069 2070 2071 2073 2074 2075 2079 2080 2081 2082 2083 2084 2085 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2102 2103 2104 2105 2106];
-% eyeSubs = [20280 2030 2036 2037 20380 2040 2042 2043 2046 2047 2050 2053 2055 2056 2058 2060 2063 2065 ...
-%         2068 2069 2070 2073 2080 2081 2082 2083 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2100 2101 2103 2105 2106];
-% EEGSubs = [20280 2030 2036 2037 20380 2040 2042 2043 2046 2047 2050 2053 2055 2056 2058 2060 2063 2065 ...
-%         2068 2069 2073 2080 2081 2082 2083 2085 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2100 2101 2105 2106];
-% subs = [2079,2035,2033,2045,2099,2062,2044,2075,2057,2034,2048,2066,2104,2041,2086,2039,2074,2071,2084,2073,2056,2098,2082,2095,2042,20280,2037,2105,2063,2094 ...
-%         2096,2103,2070,2097,2090,2100,2055,2081,2083,2087,2092,20380,2069,2050,2053,2093,2058,2080,2046,2030,2036,2060,2040,2101,2065,2068,2106,2043,2088,2047]; %
-% eyeSubs = [20280,2030,2033,7777];
-% behaveSubs = [20280,2030,2033,7777];
-% EEGSubs = [20280,2030,2033,7777];
-
-% eyeSubs = [2047,2106,2088,2065];
-% behaveSubs = [2047,2106,2088,2065];
-% EEGSubs = [2047,2106,2088,2065];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%                       %%%
@@ -119,10 +106,10 @@ behaveSubs = [20280 2030 2031 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042
 %%%                       %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-runModel = 0; %if 0, load previous behaveAll and reuses previous allModelDataCombScript
+runModel = 1; %if 0, load previous behaveAll and reuses previous allModelDataCombScript
 numModelReps = 40; %behavioral model repetitions, for testing, set this low (1-5) for real analysis, set to 401
 doSTPResiduals = 0; %regresses stp out of trial-by-trial signal, learning, and bias
-runEEGRegression = 0; %if 0, loads a previous b_mat_eeg
+runEEGRegression = 1; %if 0, loads a previous b_mat_eeg
 trialMeasure = 3; %3 is the right one (dot product of regressed baseline and STP map) but it takes a while (~40-120 min) to run, 2 doesn't regress baseline but is quicker
                   %need to do 3 if you're doing stp residuals
 eegTimestepMode = 0; %if 0, looks at clusters, if 1 looks at bins of timepoints in specified channels
@@ -160,7 +147,7 @@ clustThreshPred = 0.025;
 conditionTogether=1;
 useModel = 0;
 splitHalf = true;
-nStart = 10;
+nStart = 100;
 nr = 1;
 narrowWidth = .05;
 betaWidth = narrowWidth;
