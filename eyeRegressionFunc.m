@@ -5,11 +5,11 @@ function resultEye = eyeRegressionFunc(subnoStr,saveText,dirs)
 basePath = dirs.basePath;
 eyeDir =    dirs.eyeDir;
 behaveDir = dirs.behaveDir;
-smuPath =   dirs.smuPath;
+% smuPath =   dirs.smuPath;
 
 cd(basePath);
 addpath(genpath(basePath))
-addpath(genpath(smuPath)) 
+% addpath(genpath(smuPath)) 
 
 set(groot,'defaultfigureposition',[400 250 900 750])
 

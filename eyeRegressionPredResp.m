@@ -6,9 +6,9 @@ function result = eyeRegressionPredResp(subnoStr,saveText,dirs)
 basePath = dirs.basePath;
 eyeDir =    dirs.eyeDir;
 behaveDir = dirs.behaveDir;
-smuPath =   dirs.smuPath;
+% smuPath =   dirs.smuPath;
 
-addpath(genpath(smuPath))
+% addpath(genpath(smuPath))
 addpath(genpath(basePath))
 cd(basePath);
 

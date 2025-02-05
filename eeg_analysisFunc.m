@@ -2,7 +2,7 @@ function result=eeg_analysisFunc(subNum,saveText,dirs)
 showPlots=true;
 %set paths
 baseDir = dirs.basePath;
-sharedFuncDir =   dirs.smuPath;
+% sharedFuncDir =   dirs.smuPath;
 eegDataDir = dirs.eegDir;
 behaveDataDir = dirs.behaveDir;
 modelDataDir = [dirs.behaveDir,'allModelData',saveText];
@@ -15,7 +15,7 @@ modelDataDir = [dirs.behaveDir,'allModelData',saveText];
 
 % Add entire set of subdirectories to the path
 addpath(genpath(baseDir))
-addpath(genpath(sharedFuncDir))
+% addpath(genpath(sharedFuncDir))
 
 
 % parameters
