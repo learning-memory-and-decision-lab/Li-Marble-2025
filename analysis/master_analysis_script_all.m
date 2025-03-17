@@ -19,7 +19,7 @@ clear
 % 7. download the full behavioral data (files titled XXXX_allBlockData.mat) from ALP_Summer2022\vwm_task_Harry\behaveData\allSubCombined and place in allSubCombined subfolder
 % 8. download the prediction phase's behavioral data (files titled XXXX_3and4BlockData.mat) from ALP_Summer2022\vwm_task_Harry\behaveData\subCombined and place in subCombined subfolder
 % 9. create a final subfolder for figures that the script will generate figures and set that folder as figDir
-% 10. download the version of sharedMatlabUtilities that exists in the ALP_Summer2022 folder and place that as a subfolder in basePath. Set smuPath to the sharedMatlabUtilities location
+% 10. download the version of sharedMatlabUtilities that exists in the ALP_Summer2022 folder and place that as a subfolder in basePath. Set smuPath to the helperFuncs location
 % 11. review directories, it should look something like
 %
 %     basePath
@@ -34,46 +34,31 @@ clear
 %         eegData
 %             XXXX_ALP_FILT_STIM.mat
 %         figDir
-%         sharedMatlabUtilities
+%         
 %
 % 12. review parameters, note that the first time you run the script, runEEGRegression and runModel should both be true
 % 13. verify that the EEGSubs, eyeSubs, and behaveSubs lists in the script match up with the data that has been downloaded to your computer
 %     (script should stop and inform you if data isn't on your path)
+
 %% Step 1: Set parameters/paths
 
 whichComp = 1;
 
 if whichComp == 1
-    basePath =  'C:\Users\gulli\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\';
-    eyeDir =    'C:\Users\gulli\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\ET_data\';
-    behaveDir = 'C:\Users\gulli\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\behaveData\';
-    smuPath =   'C:\Users\gulli\Brown Dropbox\Harrison Marble\ALP_Summer2022\sharedMatlabUtilities\';
-    eegDir =    'C:\Users\gulli\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\eegDataSmall\';
-    figDir =    'C:\Users\gulli\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\figures\generatedFigs\';
-elseif whichComp == 2
-    basePath =  'C:\Users\nassarlab\Brown Dropbox\Matthew Nassar\ALP_Summer2022\vwm_task_Harry\';
-    eyeDir =    'C:\Users\nassarlab\Brown Dropbox\Matthew Nassar\ALP_Summer2022\vwm_task_Harry\ET_data\';
-    behaveDir = 'C:\Users\nassarlab\Brown Dropbox\Matthew Nassar\ALP_Summer2022\vwm_task_Harry\behaveData\';
-    smuPath =   'C:\Users\nassarlab\Brown Dropbox\Matthew Nassar\ALP_Summer2022\sharedMatlabUtilities';
-    eegDir =    'C:\Users\nassarlab\Brown Dropbox\Matthew Nassar\ALP_Summer2022\vwm_task_Harry\eegDataSmall\';
-    figDir =    'C:\Users\nassarlab\Brown Dropbox\Matthew Nassar\ALP_Summer2022\vwm_task_Harry\figures\generatedFigs\'; 
-elseif whichComp == 3
-    basePath =  'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\';
-    eyeDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\ET_data\';
-    behaveDir = 'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\behaveData\';
-    smuPath =   'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\sharedMatlabUtilities';
-    eegDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\eegDataSmall\';
-    figDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\figures\generatedFigs\'; 
+    basePath =  '~/Documents/GitHub/Li-Marble-2025/analysis/';
+    eyeDir =    '~/Documents/GitHub/Li-Marble-2025/data/ET_data/';
+    behaveDir = '~/Documents/GitHub/Li-Marble-2025/data/behaveData/';
+    smuPath =   '~/Documents/GitHub/Li-Marble-2025/analysis/helperFuncs/';
+    subFunc = '~/Documents/GitHub/Li-Marble-2025/analysis/subFunctions/';
+    eegDir =    '~/Documents/GitHub/Li-Marble-2025/data/eegDataSmall/';
+    figDir =    '~/Documents/GitHub/Li-Marble-2025/data/figures/generatedFigs/';
+
 else
-    basePath =  '*\ALP_Summer2022\vwm_task_Harry\';
-    eyeDir =    '*\ALP_Summer2022\vwm_task_Harry\ET_data\';
-    behaveDir = '*\ALP_Summer2022\vwm_task_Harry\behaveData\';
-    smuPath =   '*\ALP_Summer2022\sharedMatlabUtilities';
-    eegDir =    '*\ALP_Summer2022\vwm_task_Harry\eegData\';
-    figDir =    '*\ALP_Summer2022\vwm_task_Harry\figures\generatedFigs\'; 
+    
 end
+
 addpath(genpath(basePath))
-% addpath(genpath(smuPath))
+addpath(genpath(subFunc))
 
 dirs.basePath = basePath;
 dirs.eyeDir = eyeDir;
@@ -94,12 +79,29 @@ nAllTrials = 300;
 nPracticeTrials = 60;
 sigThresh = 0.025;
 
-EEGSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2058 2060 2062 2063 2065 2066 ...
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%                       %%%
+%%%  set subject IDs      %%%
+%%%                       %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+allData=input('are you using the whole dataset?  Yes(1)/No(0):');
+
+
+if allData
+    EEGSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2058 2060 2062 2063 2065 2066 ...
         2068 2069 2071 2073 2074 2075 2080 2081 2082 2083 2084 2085 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2104 2105 2106];
-eyeSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 2066 2068 ...
+    eyeSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 2066 2068 ...
         2069 2070 2071 2073 2074 2075 2079 2080 2081 2082 2083 2084 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2103 2104 2105 2106];
-behaveSubs = [20280 2030 2031 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 ...
+    behaveSubs = [20280 2030 2031 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 ...
         2066 2068 2069 2070 2071 2073 2074 2075 2079 2080 2081 2082 2083 2084 2085 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2102 2103 2104 2105 2106];
+else
+    EEGSubs=[];
+    eyeSubs=[];
+    behaveSubs=[];
+end
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%                       %%%
