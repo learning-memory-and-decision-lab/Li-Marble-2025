@@ -20,13 +20,20 @@ This folder includes MATLAB scripts and functions for analyzing EEG, eye-trackin
 1. If accessing full dataset, prepare approximately 70 GB of space.
 2. Create your directory structure:
 
+```
 basePath/
+├── analysis/
 ├── behaveData/
-│   ├── allSubCombined/ (contains XXXX_allBlockData.mat)
+│   ├── allSubCombined/
+│   │   └── XXXX_allBlockData.mat
 │   └── subCombined/
-├── eegData/ (contains XXXX_ALP_FILT_STIM.mat)
+│       └── XXXX_3and4BlockData.mat
+├── eegData/
+│   └── XXXX_ALP_FILT_STIM.mat
 ├── eyeData/
-└── figDir/
+│   └── XXXX.mat
+└── figDir/ 
+```
 
 3. Download EEG data (`XXXX_ALP_FILT_STIM.mat`) into eegData.
 4. Download behavioral data files (XXXX_allBlockData.mat) into behaveData/allSubCombined.
