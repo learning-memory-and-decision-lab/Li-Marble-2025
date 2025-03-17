@@ -2,6 +2,7 @@
 clear
 %Functions Called: eeg_analysisFunc eyeRegressionFunc eyeRegressionPredResp computeLearningRate getEEGClusterSize getPupilClusterSize modelCP modelOB eyeAnalysis shared_variables
 %Data Needed: behave data all blocks; behave data 3 and 4; eye data; eeg data; chanlocs;
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%                       %%%
 %%%  SETUP INSTRUCTIONS:  %%%
