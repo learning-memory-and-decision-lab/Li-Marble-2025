@@ -26,7 +26,7 @@ basePath/
 │   └── subCombined/
 ├── eegData/ (contains XXXX_ALP_FILT_STIM.mat)
 ├── eyeData/
-├── figDir/
+└── figDir/
 
 3. Download EEG data (`XXXX_ALP_FILT_STIM.mat`) into eegData.
 4. Download behavioral data files (XXXX_allBlockData.mat) into behaveData/allSubCombined.
