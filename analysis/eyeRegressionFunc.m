@@ -1,4 +1,4 @@
-function resultEye = eyeRegressionFunc(subnoStr,saveText,dirs)
+function resultEye = eyeRegressionFunc(subnoStr,saveText,tB,tA,bW,bT,dirs)
 
 %basic pupil regression
 % set paths
@@ -14,7 +14,7 @@ addpath(genpath(basePath))
 set(groot,'defaultfigureposition',[400 250 900 750])
 
 % setting certain parameters
-blinkWindow = 150;
+blinkWindow = bW;
 leftArea = 4;
 rightArea = 7;
 nTrials = 300;
@@ -24,17 +24,12 @@ firstTrial = [61,62,181,182];
 notFirst = true(nTrials,1);
 notFirst(firstTrial) = false;
 
-baselineTime = 1000;
-timeBefore = 1000; %must be >= baselineTime
-timeAfter = 4000;
+baselineTime = bT;
+timeBefore = tB; %must be >= baselineTime
+timeAfter = tA;
 
-badSubs = 30;
 thresh = 0.2;
 doBaseline = 1;
-
-subs = [2079,2035,2033,2045,2099,2062,2044,2075,2057,2034,2048,2066,2104,2041,2086,2039,2074,2071,2084,2073,2056,2098,2082,2095,2042,20280,2037,2105,2063,2094 ... 
-        2096,2103,2070,2097,2090,2100,2055,2081,2083,2087,2092,20380,2069,2050,2053,2093,2058,2080,2046,2030,2036,2060,2040,2101,2065,2068,2106,2043,2088,2047]; 
-
 
 if doBaseline == 1
     titles = ["Intercept","MeanSTP","MeanSTPCPOB","MeanEntropy","Condition","SumSinColor","SumCosColor","Baseline 1000 ms"];
@@ -57,7 +52,7 @@ end
        eyeData(:,5:7)=eyeData(:,2:4);
     end
     %Remove bad eye from data with one bad eye
-    if ismember(subno,[2030,2063])
+    if ismember(subno,[2030,2063,1001])
         eyeData(:,2:4)=eyeData(:,5:7);
     end
     if ismember(subno,[2035 2057 2058 2062 2071 2083 2087 2098 2101 2103 2106])

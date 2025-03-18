@@ -69,7 +69,7 @@ addpath(genpath(smuPath))
 dirs.basePath = basePath;
 dirs.eyeDir = eyeDir;
 dirs.behaveDir = behaveDir;
-dirs.smuPath = smuPath;
+% dirs.smuPath = smuPath;
 dirs.eegDir = eegDir;
 dirs.figDir = figDir;
 
@@ -92,10 +92,10 @@ sigThresh = 0.025;
 %%%                       %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-allData=input('are you using the whole dataset?  Yes(1)/No(0):');
+realData=input('are you using the whole dataset?  Yes(1)/No(0):');
 
 
-if allData
+if realData
     EEGSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2058 2060 2062 2063 2065 2066 ...
         2068 2069 2071 2073 2074 2075 2080 2081 2082 2083 2084 2085 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2104 2105 2106];
     eyeSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 2066 2068 ...
@@ -116,10 +116,10 @@ end
 %%%                       %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-runModel = 1; %if 0, load previous behaveAll and reuses previous allModelDataCombScript
+runModel = 0; %if 0, load previous behaveAll and reuses previous allModelDataCombScript
 numModelReps = 40; %behavioral model repetitions, for testing, set this low (1-5) for real analysis, set to 401
 doSTPResiduals = 0; %regresses stp out of trial-by-trial signal, learning, and bias
-runEEGRegression = 1; %if 0, loads a previous b_mat_eeg
+runEEGRegression = 0; %if 0, loads a previous b_mat_eeg
 trialMeasure = 3; %3 is the right one (dot product of regressed baseline and STP map) but it takes a while (~40-120 min) to run, 2 doesn't regress baseline but is quicker
                   %need to do 3 if you're doing stp residuals
 eegTimestepMode = 0; %if 0, looks at clusters, if 1 looks at bins of timepoints in specified channels
@@ -127,10 +127,18 @@ oddballFigNewVer = 1;
 sigma_y = 31;
 
 %Stimulus eye params
-timeBeforeEye = 1000;
-timeAfterEye = 4000;
-baselineTimeEye=1000;
-blinkWindow = 150;
+if realData
+    timeBeforeEye = 1000;
+    timeAfterEye = 4000;
+    baselineTimeEye=1000;
+    blinkWindow = 150;
+else
+    timeBeforeEye = 250;
+    timeAfterEye = 1000;
+    baselineTimeEye= 250;
+    blinkWindow = 35;    
+end
+
 blinkThresh = 0.2;
 numPermEye=2500; % permutation test number
 leftArea = 4;
@@ -148,8 +156,13 @@ clustThreshEEG = 0.01;
 recreateConnectionMat = 1;
 
 %Prediction eye params
-timeBeforePred = 2000;
-timeAfterPred = 4000;
+if realData
+    timeBeforePred = 2000;
+    timeAfterPred = 4000;
+else
+    timeBeforePred = 500;
+    timeAfterPred = 1000;
+end
 noPredTrials = [239,240,479,480];
 clustThreshPred = 0.025;
 
@@ -178,13 +191,13 @@ figTime = datestr(now,'mm-dd-yy-hh');
 
 if runEEGRegression ~=1
     % if you're skipping the eeg regression, load a b_mat_eeg file of your choice
-    load("b_mat_eegCombScript_31_12-02-24-14_Official.mat")
+    load("b_mat_eegCombScript_31_03-17-25-20_test.mat")
 end
 
 if runModel ~=1
     % if you're skipping the behavioral regression, load results from a previous run and resave them with the new run's saveText tag so 
     % the script can load the right allModelData files later
-    load('behaveAllCombScript_31_12-02-24-14_Official.mat')
+    load('behaveAllCombScript_31_03-17-25-20_test.mat')
 
     for s=1:length(behaveSubs)
         subStr = num2str(behaveSubs(s));
@@ -192,7 +205,7 @@ if runModel ~=1
         DP = fullfile(basePath, fileName);
         vars = shared_variables(DP);
        
-        allModelData = load(fullfile(behaveDir,['allModelDataCombScript_31_12-02-24-14_Official/', subStr, '_allBlockData.mat']));
+        allModelData = load(fullfile(behaveDir,['allModelDataCombScript_31_03-17-25-20_test/', subStr, '_allBlockData.mat']));
         allDataStruct = allModelData.allDataStruct;
     
         saveDir=[behaveDir,'allModelData',saveText,'/'];
@@ -289,7 +302,7 @@ for s=1:length(behaveSubs)  %loop through all subs
     if ~ismember(subNum,[2031,2085,2102,7777])
         eyePath=sprintf('%s.mat',subStr);
         eyePath=[eyeDir,eyePath];
-        resultEye = eyeAnalysis(eyePath,3000, 2000, 150,subStr,basePath,DP,smuPath);    
+        resultEye = eyeAnalysis(eyePath,timeBefore, timeAfter, blinkWindow,subStr,basePath,DP,smuPath); 
         if allDataStruct.condition(1)==1
             CPgazeAttention=[resultEye.gazeAttention(1:nTrials,1);resultEye.gazeAttention(1:nTrials,2)];
             OBgazeAttention=[resultEye.gazeAttention(nTrials+1:end,1);resultEye.gazeAttention(nTrials+1:end,2)];
@@ -420,7 +433,7 @@ end
 beep
 end
 % straighten behave all structure and add not move (variable of distance between estimation and start point)
-behaveAll=straightStruct(behaveAll);    
+behaveAll=straightStruct(behaveAll);
 behaveAll.notMove=circ_dist(deg2rad(behaveAll.est),deg2rad(behaveAll.startPoint));
 
 %save all subjects' model calculated surprise,entropy,etc.
@@ -1132,7 +1145,7 @@ for s=1:length(eyeSubs)
     subno=eyeSubs(s);
     subNum=num2str(subno);
     disp(subNum)
-    resultEye=eyeRegressionFunc(subNum,saveText,dirs);
+    resultEye=eyeRegressionFunc(subNum,saveText,timeBeforeEye,timeAfterEye,blinkdirs);
     resultEyePred=eyeRegressionPredResp(subNum,saveText,dirs);
     allBs(:,:,s) = resultEye.B;
     BBaseline(s,:) = resultEye.BBaseline;
@@ -1386,16 +1399,27 @@ subplot(19,12,panel12);
 subplot(19,12,panel22b);
 %Running pupil regressors
     %plot each regressor with error bars in right color
-    sem = std(allBsPerm(:,:,2))./sqrt(length(eyeSubs)-1);
-    shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,2)),[mean(allBsPerm(:,:,2))-sem;mean(allBsPerm(:,:,2))+sem],{'-','color',cbColors(5,:),'markerfacecolor',cbColors(5,:)},1)
-    hold on
-    sem = std(allBsPerm(:,:,3))./sqrt(length(eyeSubs)-1);
-    shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,3)),[mean(allBsPerm(:,:,3))-sem;mean(allBsPerm(:,:,3))+sem],{'-','color',cbColors(4,:),'markerfacecolor',cbColors(4,:)},1)
-    sem = std(allBsPerm(:,:,4))./sqrt(length(eyeSubs)-1);
-    shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,4)),[mean(allBsPerm(:,:,4))-sem;mean(allBsPerm(:,:,4))+sem],{'-','color',cbColors(2,:),'markerfacecolor',cbColors(2,:)},1)
-    sem = std(allBsPerm(:,:,5))./sqrt(length(eyeSubs)-1);
-    shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,5)),[mean(allBsPerm(:,:,5))-sem;mean(allBsPerm(:,:,5))+sem],{'-','color',cbColors(3,:),'markerfacecolor',cbColors(3,:)},1)
-    
+    if realData
+        sem = std(allBsPerm(:,:,2))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,2)),[mean(allBsPerm(:,:,2))-sem;mean(allBsPerm(:,:,2))+sem],{'-','color',cbColors(5,:),'markerfacecolor',cbColors(5,:)},1)
+        hold on
+        sem = std(allBsPerm(:,:,3))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,3)),[mean(allBsPerm(:,:,3))-sem;mean(allBsPerm(:,:,3))+sem],{'-','color',cbColors(4,:),'markerfacecolor',cbColors(4,:)},1)
+        sem = std(allBsPerm(:,:,4))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,4)),[mean(allBsPerm(:,:,4))-sem;mean(allBsPerm(:,:,4))+sem],{'-','color',cbColors(2,:),'markerfacecolor',cbColors(2,:)},1)
+        sem = std(allBsPerm(:,:,5))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,5)),[mean(allBsPerm(:,:,5))-sem;mean(allBsPerm(:,:,5))+sem],{'-','color',cbColors(3,:),'markerfacecolor',cbColors(3,:)},1)
+    else
+        sem = std(allBsPerm(:,:,2))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,2)),[mean(allBsPerm(:,:,2))-sem;mean(allBsPerm(:,:,2))+sem],{'-','color',cbColors(5,:),'markerfacecolor',cbColors(5,:)},1)
+        hold on
+        sem = std(allBsPerm(:,:,3))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,3)),[mean(allBsPerm(:,:,3))-sem;mean(allBsPerm(:,:,3))+sem],{'-','color',cbColors(4,:),'markerfacecolor',cbColors(4,:)},1)
+        sem = std(allBsPerm(:,:,4))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,4)),[mean(allBsPerm(:,:,4))-sem;mean(allBsPerm(:,:,4))+sem],{'-','color',cbColors(2,:),'markerfacecolor',cbColors(2,:)},1)
+        sem = std(allBsPerm(:,:,5))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,5)),[mean(allBsPerm(:,:,5))-sem;mean(allBsPerm(:,:,5))+sem],{'-','color',cbColors(3,:),'markerfacecolor',cbColors(3,:)},1)
+    end
     % the part where you add significant clusters to figure
     if ~isempty(sigTimes)
         scatter((sigTimes-timeBeforeEye-1)/1000,mean(allBsPerm(:,sigTimes,2)),5,[0.1621    0.3301    0.1992],"filled")
@@ -2889,7 +2913,7 @@ if ~isempty(gSig)
         xlabel("Parameter")
         tickLabels = [];
         for i = 1:length(borderTimes)-1
-            tickLabels = string([tickLabels;[num2str(borderTimes(i)-2000),'ms to ',num2str(borderTimes(i+1)-2000),'ms']]);
+            tickLabels = string([tickLabels;[num2str(borderTimes(i)-timeBeforeEEG),'ms to ',num2str(borderTimes(i+1)-timeBeforeEEG),'ms']]);
         end
         yticklabels(tickLabels')
         xticklabels(["BiasCP","BiasOB","BiasSum","LRCP","LROB","LRDiff"])
