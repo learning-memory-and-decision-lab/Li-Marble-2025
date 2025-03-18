@@ -34,7 +34,7 @@ basePath/
 │   └── XXXX.mat
 └── figDir/ 
 ```
-
+Downloading example data should take 1-2 minutes
 3. Download EEG data (`XXXX_ALP_FILT_STIM.mat`) into eegData.
 4. Download behavioral data files (XXXX_allBlockData.mat) into behaveData/allSubCombined.
 5. Place eye-tracking data files (XXXX.mat) into the eyeData folder.
