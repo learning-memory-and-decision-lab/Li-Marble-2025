@@ -85,7 +85,7 @@ sigThresh = 0.025;
 %%%                       %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-allData=input('are you using the whole dataset?  Yes(1)/No(0):');
+allData=input('are you using the whole dataset? (enter 0 if running Github sample data) Yes(1)/No(0):');
 
 
 if allData
