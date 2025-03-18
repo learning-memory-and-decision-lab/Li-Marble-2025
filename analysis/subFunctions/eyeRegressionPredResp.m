@@ -1,4 +1,4 @@
-function result = eyeRegressionPredResp(subnoStr,saveText,dirs)
+function result = eyeRegressionPredResp(subnoStr,saveText,tB,tA,bW,bTS,bTE,dirs)
 
 % Prediction Phase Pupil Regression (locked to PredResp1)
 
@@ -15,12 +15,12 @@ cd(basePath);
 set(groot,'defaultfigureposition',[400 250 900 750])
 
 % setting certain parameters
-blinkWindow = 150;
-timeBefore = 2000;
-timeAfter = 4000;
+blinkWindow = bW;
+timeBefore = tB;
+timeAfter = tA;
 baselineTime = 2000; %use this for doBaseline == 1 or 2
-baselineTimeStart = 2000; %use these for doBaseline == 3 time is ms before predResp
-baselineTimeEnd   = 500;
+baselineTimeStart = bTS; %use these for doBaseline == 3 time is ms before predResp
+baselineTimeEnd   = bTE;
 leftArea = 4;
 rightArea = 7;
 nTrials = 476;
@@ -58,7 +58,7 @@ end
        eyeData(:,5:7)=eyeData(:,2:4);
     end
     %Remove bad eye from data with one bad eye
-    if ismember(subno,[2030,2063])
+    if ismember(subno,[2030,2063,1001])
         eyeData(:,2:4)=eyeData(:,5:7);
     end
     if ismember(subno,[2035 2057 2058 2062 2071 2083 2087 2098 2101 2103 2106])
@@ -107,7 +107,7 @@ end
     
     % Find start of each trial (stimOn) in terms of eyeData timesteps
     
-    if ~ismember(subno,[20280 2030 2079 2103 7777])
+    if ~ismember(subno,[20280 2030 2079 2103 7777 4000:4100 1001])
         trialStartAll = [0; find(eyeData(:,8) == 11)];
     else
         trial1StartAll = [0; find(eyeData(:,8) == 11)];
@@ -125,7 +125,7 @@ end
     trialStart = trialStart';
  
     %find start of pred phase
-    if ~ismember(subno,[20280 2030 2079 2103 7777])
+    if ~ismember(subno,[20280 2030 2079 2103 7777 4000:4100 1001])
         predStartAll = [0; find(eyeData(:,8) == 7)];
     else
         pred1StartAll = [0; find(eyeData(:,8) == 7)];
