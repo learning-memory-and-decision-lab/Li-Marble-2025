@@ -63,3 +63,7 @@ Setup:
 
 ### Data Path
 - Contains simulated data to run analysis script
+
+### License Information
+Copyright Harrison Marble and Tiantian Li, Brown University, 2025.
+Licensed under the Academic Free License version 3.0.
