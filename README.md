@@ -37,17 +37,21 @@ basePath/
 
 3. Download EEG data (`XXXX_ALP_FILT_STIM.mat`) into eegData.
 4. Download behavioral data files (XXXX_allBlockData.mat) into behaveData/allSubCombined.
-5. Place eye-tracking data files into the eyeData folder.
-6. Download the sharedMatlabUtilities and place in basePath.
+5. Place eye-tracking data files (XXXX.mat) into the eyeData folder.
+6. Download the subFunctions and helperFunctions folders and place in basePath.
 
 Functions included:
 - eeg_analysisFunc
 - eyeRegressionFunc
 - eyeRegressionPredResp
 - computeLearningRate
-- getEEGCluster
+- getEEG_clusterSize
 - shared_variables
 - chanlocs
+- modelCP
+- modelOB
+
+Running the script on data included in this repository takes ~20 minutes. It should generate all parts of the figures that can be generated without significant EEG or pupil results.
 
 ### Task Path
 - Contains MATLAB scripts implementing the behavioral and EEG/pupil recording tasks using Psychtoolbox-3.
