@@ -42,7 +42,7 @@ clear
 
 %% Step 1: Set parameters/paths
 
-whichComp = 2;
+whichComp = 1;
 
 if whichComp == 1
     basePath =  '~/Documents/GitHub/Li-Marble-2025/analysis/';
@@ -52,19 +52,12 @@ if whichComp == 1
     subFunc =   '~/Documents/GitHub/Li-Marble-2025/analysis/subFunctions/';
     eegDir =    '~/Documents/GitHub/Li-Marble-2025/data/eegDataSmall/';
     figDir =    '~/Documents/GitHub/Li-Marble-2025/data/figures/generatedFigs/';
-elseif whichComp == 2
-    basePath =  'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\';
-    eyeDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\ET_data\';
-    behaveDir = 'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\behaveData\';
-    smuPath =   'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\sharedMatlabUtilities';
-    eegDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\eegDataSmall\';
-    figDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\figures\generatedFigs\'; 
 else
     
 end
 
 addpath(genpath(basePath))
-addpath(genpath(smuPath))
+addpath(genpath(subFunc))
 
 dirs.basePath = basePath;
 dirs.eyeDir = eyeDir;
