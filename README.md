@@ -51,7 +51,7 @@ Functions included:
 - modelCP
 - modelOB
 
-Running the script on data included in this repository takes ~20 minutes. It should generate all parts of the figures that can be generated without significant EEG or pupil results. For the parts of the figures which require significant EEG or pupil results, it will generate results using a template frontal positive ERP and pupil dilation.
+Running the script on data included in this repository takes ~20 minutes. It should generate all parts of the figures that can be generated without significant EEG or pupil results. For the parts of the figures which require significant EEG or pupil results, it will generate results using a template frontal positive ERP and pupil dilation. There are only 5 trials in the sample EEG data, so a lot of the analyses won't work correctly.
 
 ### Task Path
 - Contains MATLAB scripts implementing the behavioral and EEG/pupil recording tasks using Psychtoolbox-3.
