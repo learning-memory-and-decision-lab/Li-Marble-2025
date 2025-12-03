@@ -42,7 +42,7 @@ clear
 
 %% Step 1: Set parameters/paths
 
-whichComp = 1;
+whichComp = 2;
 
 if whichComp == 1
     basePath =  '~/Documents/GitHub/Li-Marble-2025/analysis/';
@@ -52,17 +52,22 @@ if whichComp == 1
     subFunc =   '~/Documents/GitHub/Li-Marble-2025/analysis/subFunctions/';
     eegDir =    '~/Documents/GitHub/Li-Marble-2025/data/eegDataSmall/';
     figDir =    '~/Documents/GitHub/Li-Marble-2025/data/figures/generatedFigs/';
-else
-    
+elseif whichComp == 2
+    basePath =  'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\';
+    eyeDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\ET_data\';
+    behaveDir = 'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\behaveData\';
+    smuPath =   'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\sharedMatlabUtilities';
+    eegDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\eegDataSmall\';
+    figDir =    'C:\Users\hmarble\Brown Dropbox\Harrison Marble\ALP_Summer2022\vwm_task_Harry\figures\generatedFigs\'; 
 end
 
 addpath(genpath(basePath))
-addpath(genpath(subFunc))
+addpath(genpath(smuPath))
 
 dirs.basePath = basePath;
 dirs.eyeDir = eyeDir;
 dirs.behaveDir = behaveDir;
-% dirs.smuPath = smuPath;
+dirs.smuPath = smuPath;
 dirs.eegDir = eegDir;
 dirs.figDir = figDir;
 
@@ -81,20 +86,27 @@ sigThresh = 0.025;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%                       %%%
-%%%  set subject IDs      %%%
+%%%    set subject IDs    %%%
 %%%                       %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-realData=input('are you using the whole dataset?  Yes(1)/No(0):');
+% realData=input('are you using the whole dataset?  Yes(1)/No(0):'); if script is public
+realData=0;
 
 
 if realData
-    EEGSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2058 2060 2062 2063 2065 2066 ...
-        2068 2069 2071 2073 2074 2075 2080 2081 2082 2083 2084 2085 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2104 2105 2106];
-    eyeSubs = [20280 2030 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 2066 2068 ...
-        2069 2070 2071 2073 2074 2075 2079 2080 2081 2082 2083 2084 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2103 2104 2105 2106];
-    behaveSubs = [20280 2030 2031 2033 2034 2035 2036 2037 20380 2039 2040 2041 2042 2043 2044 2045 2046 2047 2048 2050 2053 2055 2056 2057 2058 2060 2062 2063 2065 ...
-        2066 2068 2069 2070 2071 2073 2074 2075 2079 2080 2081 2082 2083 2084 2085 2086 2087 2088 2090 2092 2093 2094 2095 2096 2097 2098 2099 2100 2101 2102 2103 2104 2105 2106];
+    % EEGSubs = [20280 2030 2033:2037 20380 2039:2048 2050 2053 2055 2056 2058 2060 2062 ...
+    %            2063 2065 2066 2068 2069 2071 2073:2075 2080:2088 2090 2092:2101 2104:2106];
+    % eyeSubs = [20280 2030 2033:2037 20380 2039:2048 2050 2053 2055:2058 2060 2062 2063 ...
+    %            2065 2066 2068:2071 2073:2075 2079:2084 2086:2088 2090 2092:2101 2103:2106];
+    % behaveSubs = [20280 2030 2031 2033:2037 20380 2039:2048 2050 2053 2055:2058 2060 ...
+    %               2062 2063 2065 2066 2068:2071 2073:2075 2079:2088 2090 2092:2106 3002 3006:3011 3014 3016:3023 4001:4039];
+    % behaveSubs = [20280,2030,2031,2036,2037,20380,2040,2043,2046,2047,2050,2053,2055,2056,2058,2060,2063,2065,2068,2069,2070,2071,2073,2080,2081,2082,2083,2087,2088,2090,2092,2093,2094,2097,2100,2101,2102,2106];
+    EEGSubs = 4001:4045;
+    eyeSubs = [3002 3006:3011 3014 3016:3023 4001:4041 4043:4045]; %3004 3012 3013 4042 has bad et data
+    behaveSubs = [3002 3004 3006:3014 3016:3023 4001:4045];    
+    % eyeSubs = [4001:4039];
+    % behaveSubs = [4001:4039];
 else
     %Use this data if running from github
     EEGSubs=[1001,1002,1003];
@@ -109,15 +121,22 @@ end
 %%%                       %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-runModel = 0; %if 0, load previous behaveAll and reuses previous allModelDataCombScript
-numModelReps = 40; %behavioral model repetitions, for testing, set this low (1-5) for real analysis, set to 401
+runModel = 1; %if 0, load previous behaveAll and reuses previous allModelDataCombScript
+numModelReps = 40; %behavioral model repetitions, for testing, set this low (1-5) for real analysis, set to 40
 doSTPResiduals = 0; %regresses stp out of trial-by-trial signal, learning, and bias
-runEEGRegression = 0; %if 0, loads a previous b_mat_eeg
+runEEGRegression = 1; %if 0, loads a previous b_mat_eeg
 trialMeasure = 3; %3 is the right one (dot product of regressed baseline and STP map) but it takes a while (~40-120 min) to run, 2 doesn't regress baseline but is quicker
                   %need to do 3 if you're doing stp residuals
 eegTimestepMode = 0; %if 0, looks at clusters, if 1 looks at bins of timepoints in specified channels
 oddballFigNewVer = 1;
-sigma_y = 31;
+rejTrialsPerBlock = 30;
+sigma_y = 30.5;                        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%CHANGEBACK%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+saveText = ['CombScript_',num2str(sigma_y),'_',datestr(now,'mm-dd-yy-hh'),'trialDataTest'];
+% figTime = datestr(now,'mm-dd-yy-hh');
+figTime = saveText;
+
+% saveText = ['CombScript_31_12-02-24-14_Official'];
 
 %Stimulus eye params
 if realData
@@ -132,6 +151,7 @@ else
     blinkWindow = 35;    
 end
 
+nBlockTrials = 120;
 blinkThresh = 0.2;
 numPermEye=2500; % permutation test number
 leftArea = 4;
@@ -147,6 +167,16 @@ numPermEEG = 1000;
 connectThresh=.40;
 clustThreshEEG = 0.01;
 recreateConnectionMat = 1;
+
+%prepares to removes number of trials from rejTrialsPerBlock at the beginning of each block
+remTrials = [];
+nTrials = 240;
+rejEarlyTrials = zeros(nTrials,1);
+
+if rejTrialsPerBlock>0
+    rejEarlyTrials([1:rejTrialsPerBlock,nBlockTrials+1:nBlockTrials+rejTrialsPerBlock])=1;
+    % rejEarlyTrials([nBlockTrials-rejTrialsPerBlock+1:nBlockTrials,2*nBlockTrials-rejTrialsPerBlock+1:2*nBlockTrials])=1;
+end
 
 %Prediction eye params
 if realData
@@ -167,42 +197,51 @@ clustThreshPred = 0.025;
 conditionTogether=1;
 useModel = 0;
 splitHalf = true;
-nStart = 100;
+nStart = 100;                            %%%%%%%%%
 nr = 1;
 narrowWidth = .05;
 betaWidth = narrowWidth;
+
+%usually i keep the bounds here so there's no ceiling effect at 1
 LB = -1.5;
 UB = 1.5;
 
 lastTrials = [120,240];
 
 % file names will contain sigma_y, date, and hour you ran script
-% e.g. if sigma_y = 33 and you start the script at 5:29 on November 1, files would have the tag 'CombScript_33_11-01-24-17'
+% e.g. if sigma_y = 33 and you start the script at 5:29 on November 1 2024, files would have the tag 'CombScript_33_11-01-24-17'
 % you can also set this manually if you want to include more info about the run
 
-saveText = ['CombScript_',num2str(sigma_y),'_',datestr(now,'mm-dd-yy-hh'),'_test'];
+% saveTest = {'CombScript_'}
 % saveText = ['CombScript_33_10-29-24-13'];
 
 % if you want to load some results from a previous run but keep the new figures with the new time, don't change figTime
-figTime = datestr(now,'mm-dd-yy-hh');
 
 if runEEGRegression ~=1
     % if you're skipping the eeg regression, load a b_mat_eeg file of your choice
-    load("b_mat_eegCombScript_31_03-17-25-20_test.mat")
+    % load("b_mat_eegCombScript_30.5_05-13-25-14_newDatasetTest.mat")
+    % load("b_mat_eegCombScript_31_12-02-24-14_Official.mat")
+    load("b_mat_eegCombScript_31_09-09-25-191000Rep.mat")
 end
 
 if runModel ~=1
     % if you're skipping the behavioral regression, load results from a previous run and resave them with the new run's saveText tag so 
     % the script can load the right allModelData files later
-    load('behaveAllCombScript_31_03-17-25-20_test.mat')
-
+    % load('behaveAllCombScript_30.5_05-13-25-14_newDatasetTest.mat')
+    % load('behaveAllCombScript_31_12-02-24-14_Official.mat')
+    behaveAll=[];
     for s=1:length(behaveSubs)
         subStr = num2str(behaveSubs(s));
         fileName=sprintf('behaveData/subCombined/%s_3and4BlockData.mat',subStr);
         DP = fullfile(basePath, fileName);
         vars = shared_variables(DP);
        
-        allModelData = load(fullfile(behaveDir,['allModelDataCombScript_31_03-17-25-20_test/', subStr, '_allBlockData.mat']));
+        % allModelData = load(fullfile(behaveDir,['allModelDataCombScript_30.5_05-13-25-14_newDatasetTest/', subStr, '_allBlockData.mat']));
+        % allModelData = load(fullfile(behaveDir,['allModelDataCombScript_31_12-02-24-14_Official/', subStr, '_allBlockData.mat']));
+        % allModelData = load(fullfile(behaveDir,['allModelDataCombScript_31_08-25-25-16_40RepGoodEst/', subStr, '_allBlockData.mat']));
+        % allModelData = load(fullfile(behaveDir,['allModelDataCombScript_31_09-09-25-191000Rep/', subStr, '_allBlockData.mat']));
+        allModelData = load(fullfile(behaveDir,['allModelData30.5/', subStr, '_allBlockData.mat']));
+        % allModelData = load(fullfile(behaveDir,['allModelData10/', subStr, '_allBlockData.mat']));
         allDataStruct = allModelData.allDataStruct;
     
         saveDir=[behaveDir,'allModelData',saveText,'/'];
@@ -211,6 +250,11 @@ if runModel ~=1
         end
         fn=fullfile(saveDir,[subStr,'_allBlockData.mat']);
         save(fn,'allDataStruct')
+        if isempty(behaveAll)
+            behaveAll=allDataStruct;
+        elseif  exist('behaveAll')&& ~isempty(behaveAll)
+            behaveAll=catBehav(allDataStruct,behaveAll);
+        end
     end
 end
 
@@ -255,6 +299,7 @@ if runModel == 1
 behaveAll=[];   
 for s=1:length(behaveSubs)  %loop through all subs
     tic
+    %define subject number & file names
     subNum=behaveSubs(s);
     subStr=num2str(subNum);
     disp(subNum) 
@@ -274,6 +319,10 @@ for s=1:length(behaveSubs)  %loop through all subs
     allDataStruct = data.alldata;% (data.alldata.block == 3 | data.alldata.block == 4);
     allDataStruct = straightStruct(allDataStruct);
     alldata = allDataStruct;
+
+    %calculate standard deviation of estimation error (in case you want to
+    %use this as sigma_y)
+    estStd(s) = std(allBlockData.estErr(21:60,:),[],'all');
     vars.sigma_y = sigma_y;
     disp(vars.sigma_y)
     nTrials = 120;
@@ -282,24 +331,20 @@ for s=1:length(behaveSubs)  %loop through all subs
     % 2 -- run modeling script lots of times, take "average" of everything
     %      you will use.
     % 3 -- create one structure to store data could be allDataStruct. Add
-    %       fields for each variable you will extract from model. Plug in
-    %        "averaged" model values to those fields for appropriate condition.
+    %      fields for each variable you will extract from model. Plug in
+    %      "averaged" model values to those fields for appropriate condition.
+    %      especially for STP and Entropy
     % 4 -- rerun behavioral analyses with averaged model data. Make sure to
-    %      do a check of whether new "surprise" measures make sense. For
-    %      example plot update as a function of prediction error... plot
-    %      trials with "high surprise" in a different color. Are they the
-    %      big prediction error trials? I hope so.
-    
-    
-    % Once we've submitted -- goal: streamlining code so you can hit play,
-    % load arbitrary number of datasets, perform all analyses and generate
-    % all figures.
+
     
     %run eye analysis for gazeAttention variable of bias regression
-    if ~ismember(subNum,[2031,2085,2102,7777])
+    %ismember list below is list of subjects with bad/no eye data, so gaze
+    %attention is set to zero
+    if ~ismember(subNum,[2031,2085,2102,3004,3012,3013,7777,1001:1003])
         eyePath=sprintf('%s.mat',subStr);
         eyePath=[eyeDir,eyePath];
-        resultEye = eyeAnalysis(eyePath,timeBefore, timeAfter, blinkWindow,subStr,basePath,DP,smuPath); 
+        resultEye = eyeAnalysis(eyePath,timeBeforeEye, timeAfterEye, blinkWindow,subStr,basePath,DP,smuPath); 
+        
         if allDataStruct.condition(1)==1
             CPgazeAttention=[resultEye.gazeAttention(1:nTrials,1);resultEye.gazeAttention(1:nTrials,2)];
             OBgazeAttention=[resultEye.gazeAttention(nTrials+1:end,1);resultEye.gazeAttention(nTrials+1:end,2)];
@@ -319,6 +364,7 @@ for s=1:length(behaveSubs)  %loop through all subs
     allCPsubPE = [];
     allCPestErr = [];
     allCPmodelPred = [];
+    allCPmodelEst = [];
 
     allOBEntropy = [];
     allOBSurprise =[];
@@ -326,9 +372,13 @@ for s=1:length(behaveSubs)  %loop through all subs
     allOBsubPE =[];
     allOBestErr = [];
     allOBmodelPred = [];
+    allOBmodelEst = [];
 
+    %model runs multiple times and takes average surprise, entropy, etc of
+    %all runs. More runs = more runtime, but also higher accuracy
     for i = 1:numModelReps
         % Get surprise and entropy for changepoint trials:
+        vars.treatOBCP = 0;
         dataCP = modelCP(vars);
         allCPEntropy=[allCPEntropy; dataCP.entropyCP'];
         allCPSurprise=[allCPSurprise; dataCP.surpriseCP'];
@@ -336,6 +386,7 @@ for s=1:length(behaveSubs)  %loop through all subs
         allCPestErr=[allCPestErr;dataCP.perceptualErrorOnX'];
         allCPsubPE=[allCPsubPE;dataCP.predErrorCP'];
         allCPmodelPred=[allCPmodelPred;dataCP.maxLikePostMu'];
+        allCPmodelEst=[allCPmodelEst;dataCP.maxLikePostX'];
 
         % Get surprise and entropy for oddball trials:
         dataOB = modelOB(vars);
@@ -345,12 +396,18 @@ for s=1:length(behaveSubs)  %loop through all subs
         allOBestErr=[allOBestErr;dataOB.perceptualErrorOnB'];
         allOBsubPE=[allOBsubPE;dataOB.predErrorOB'];
         allOBmodelPred=[allOBmodelPred;dataOB.maxLikePostC'];
+        allOBmodelEst=[allOBmodelEst;dataOB.maxLikePostB'];
 
         if mod(i,10)==0
             disp(i)
         end
     end
 
+    %calculates learning rate with correction
+
+    %correction is if difference between prediction update and prediction
+    %error is >3*pi/2, prediction update gets "bumped" to have the same
+    %sign as pred error
     predictions = allDataStruct.pred;
     outcomes = (allDataStruct.est);
     newBlock = 121;
@@ -392,14 +449,17 @@ for s=1:length(behaveSubs)  %loop through all subs
     allDataStruct.predictionErrorOnB=circ_mean(allOBobjPE);
     allDataStruct.subPredErrorCP=circ_mean(allCPsubPE);
     allDataStruct.subPredErrorOB=circ_mean(allOBsubPE);
-    allDataStruct.maxLikePostX=dataCP.maxLikePostX;
+    allDataStruct.maxLikePostX=circ_mean(deg2rad(allCPmodelEst));
     allDataStruct.maxLikePostMu=circ_mean(deg2rad(allCPmodelPred));
-    allDataStruct.maxLikePostB=dataOB.maxLikePostB;
+    allDataStruct.maxLikePostB=circ_mean(deg2rad(allOBmodelEst));
     allDataStruct.maxLikePostC=circ_mean(deg2rad(allOBmodelPred));
     allDataStruct.LRCP = LRCP;
     allDataStruct.LROB = LROB;
     allDataStruct.biasCP = biasCP;
     allDataStruct.biasOB = biasOB;  
+
+    %straighten allDataStruct for later selbehav function which requires
+    %that all variables be the same length as # of trials
     allDataStruct = straightStruct(allDataStruct);
 
     % add blockCond (tells you what trials were in which condition) variable to aDS
@@ -413,6 +473,7 @@ for s=1:length(behaveSubs)  %loop through all subs
     end
 
     %Save subject's model calculated surprise,entropy,etc.
+    %can use model values on future runs
     saveDir=[behaveDir,'allModelData',saveText,'/'];
     if s == 1
         mkdir(saveDir)
@@ -420,6 +481,8 @@ for s=1:length(behaveSubs)  %loop through all subs
     fn=fullfile(saveDir,[subStr,'_allBlockData.mat']);
     save(fn,'allDataStruct')
 
+    %add allDataStruct to behaveAll, which is essentially a stack of all
+    %the allDataStructs
     if isempty(behaveAll)
         behaveAll=allDataStruct;
     elseif  exist('behaveAll')&& ~isempty(behaveAll)
@@ -429,20 +492,14 @@ for s=1:length(behaveSubs)  %loop through all subs
 end
 beep
 end
-% straighten behave all structure and add not move (variable of distance between estimation and start point)
+% straighten behave all structure
 behaveAll=straightStruct(behaveAll);
-behaveAll.notMove=circ_dist(deg2rad(behaveAll.est),deg2rad(behaveAll.startPoint));
 
 %save all subjects' model calculated surprise,entropy,etc.
 saveDir=[basePath];
 fn=fullfile(saveDir,['behaveAll',saveText,'.mat']);
 save(fn,'behaveAll')
 
-
-% subStr='2035';
-% fileName=sprintf('behaveData/subCombined/%s_3and4BlockData.mat',subStr);
-% DP = fullfile(basePath, fileName);
-% vars = shared_variables(DP);
 %% Raw Behavior
 % this code saves results for panels B and C of figures 3 and 4
 % preallocate variables for loop (specify allerrors/updates variables)
@@ -460,8 +517,8 @@ nBlockTrials = 120;
 nTrials = 240;
 
 %specify which trials have no bias(first trial) and no learning (first & last
-nanTrialsBias = [1,121];
-nanTrialsLearning = [1,120,121,240];
+nanTrialsBias = [1,121-rejTrialsPerBlock];
+nanTrialsLearning = [120-rejTrialsPerBlock,240-2*rejTrialsPerBlock];
 for subno = behaveSubs
     disp(subno)
     subnoStr = num2str(subno);
@@ -488,16 +545,19 @@ for subno = behaveSubs
     end
 
     %separate reproduction error for blcoks 3 and 4
-    estErr3 = [allDataStruct.estErr(61:180,1);allDataStruct.estErr(61:180,2)];
-    estErr4 = [allDataStruct.estErr(181:300,1);allDataStruct.estErr(181:300,2)];
+    b3Ts = 61+rejTrialsPerBlock:180;
+    b4Ts = 181+rejTrialsPerBlock:300;
+
+    estErr3 = [allDataStruct.estErr(b3Ts,1);allDataStruct.estErr(b3Ts,2)];
+    estErr4 = [allDataStruct.estErr(b4Ts,1);allDataStruct.estErr(b4Ts,2)];
 
     %separate subjective prediciton error for blcoks 3 and 4
-    subPredError3 = [allDataStruct.subPredErr(61:180,1);allDataStruct.subPredErr(61:180,2)];
-    subPredError4 = [allDataStruct.subPredErr(181:300,1);allDataStruct.subPredErr(181:300,2)];
+    subPredError3 = [allDataStruct.subPredErr(b3Ts,1);allDataStruct.subPredErr(b3Ts,2)];
+    subPredError4 = [allDataStruct.subPredErr(b4Ts,1);allDataStruct.subPredErr(b4Ts,2)];
     
     %separate objective prediction error for blcoks 3 and 4    
-    objPredError3 = [allDataStruct.predictErr(61:180,1);allDataStruct.predictErr(61:180,2)];
-    objPredError4 = [allDataStruct.predictErr(181:300,1);allDataStruct.predictErr(181:300,2)];
+    objPredError3 = [allDataStruct.predictErr(b3Ts,1);allDataStruct.predictErr(b3Ts,2)];
+    objPredError4 = [allDataStruct.predictErr(b4Ts,1);allDataStruct.predictErr(b4Ts,2)];
 
     %load shortened data (only blocks 3 and 4) 
     behaveMat = sprintf('subCombined/%s_3and4BlockData.mat',subnoStr);
@@ -514,17 +574,18 @@ for subno = behaveSubs
     [LR2,UP2,~] = computeLearningRate(outcomes(:,2),predictions(:,2),newBlock,'polarHalfCorrect');
     
     %concatenate LR UP and PE
-    LR3 = [LR1(2:nBlockTrials-1);LR2(2:nBlockTrials-1)];
-    LR4 = [LR1(nBlockTrials+2:end);LR2(nBlockTrials+2:end)];
-    UP3 = [UP1(2:nBlockTrials-1);UP2(2:nBlockTrials-1)];
-    UP4 = [UP1(nBlockTrials+2:end);UP2(nBlockTrials+2:end)];
+    LR3 = [LR1(rejTrialsPerBlock+1:nBlockTrials-1);LR2(rejTrialsPerBlock+1:nBlockTrials-1)];
+    LR4 = [LR1(nBlockTrials+rejTrialsPerBlock+1:end);LR2(nBlockTrials+rejTrialsPerBlock+1:end)];
+    UP3 = [UP1(rejTrialsPerBlock+1:nBlockTrials-1);UP2(rejTrialsPerBlock+1:nBlockTrials-1)];
+    UP4 = [UP1(nBlockTrials+rejTrialsPerBlock+1:end);UP2(nBlockTrials+rejTrialsPerBlock+1:end)];
 
-    learningTrials = true(nTrials,1);
-    biasTrials = true(nTrials,1);
+    %nan trials with no learning (first and last) or no bias (first)
+    learningTrials = true(nTrials-2*rejTrialsPerBlock,1);
+    biasTrials = true(nTrials-2*rejTrialsPerBlock,1);
     learningTrials(nanTrialsLearning) = false;
     biasTrials(nanTrialsBias) = false;
 
-    %specify which block of data is CP/OB
+    %specify which block (3 or 4) of data is CP/OB
     if allDataStruct.condition(1) == 1
         oddballPredError = subPredError4(learningTrials);
         oddballPredUpdate = UP4;
@@ -557,10 +618,42 @@ for subno = behaveSubs
     changepointEstErrAll = [changepointEstErrAll;changepointEstErr];
     changepointobjPredErrorAll = [changepointobjPredErrorAll;changepointobjPredError];
     subsEstErr(s) = mean(abs(allDataStruct.estErr),'all');
-
+    subsEstErrL(s) = mean(abs(allDataStruct.estErr(:,1)));
+    subsEstErrR(s) = mean(abs(allDataStruct.estErr(:,2)));
+    
     %calculate average pred err on non surprise trials
-    subsObjPredErr(s) = nanmean(abs(allDataStruct.subPredErr(surprise<0.25)),'all');
-    subsSubPredErr(s) = nanmean(abs(allDataStruct.predictErr(surprise<0.25)),'all');    
+    allDataStruct.predictErr(1:60,:)=[];
+    allDataStruct.subPredErr(1:60,:)=[];
+    
+    subsObjPredErr(s) = nanmean(abs(allDataStruct.predictErr(surprise<0.25)),'all');
+    subsSubPredErr(s) = nanmean(abs(allDataStruct.subPredErr(surprise<0.25)),'all');    
+    subsObjPredErrL(s) = nanmean(abs(allDataStruct.predictErr(surprise(:,1)<0.25,1)));
+    subsObjPredErrR(s) = nanmean(abs(allDataStruct.predictErr(surprise(:,2)<0.25,2)));
+
+    %adjust bias and learning rate to be between 0 and 1
+    biasL = allDataStruct.estErr(61:end,1)./allDataStruct.predictErr(:,1);
+    biasR = allDataStruct.estErr(61:end,2)./allDataStruct.predictErr(:,2);
+
+    biasL(biasL>1) = 1;
+    biasR(biasR>1) = 1;
+    biasL(biasL<0) = 0;
+    biasR(biasR<0) = 0;
+
+    subsBiasL(s) = nanmean(biasL);
+    subsBiasR(s) = nanmean(biasR);
+
+    LRL = LR1;
+    LRR = LR2;
+
+    LRL(LRL>1) = 1;
+    LRR(LRR>1) = 1;
+    LRL(LRL<0) = 0;
+    LRR(LRR<0) = 0;
+
+    subsLRL(s) = nanmean(LRL);
+    subsLRR(s) = nanmean(LRR);
+    % subsObjPredErrL(s) = nanmean(abs(allDataStruct.subPredErr(:,1)));
+    % subsObjPredErrR(s) = nanmean(abs(allDataStruct.subPredErr(:,2)));
 %     subsObjPredErr(s) = nanmean(abs(allDataStruct.subPredErr),'all');
 %     subsSubPredErr(s) = nanmean(abs(allDataStruct.predictErr),'all');
 end
@@ -572,21 +665,23 @@ goodEstSubs = subsEstErr<medianEstErr;
 medianObjPredErr=median(subsObjPredErr);
 goodPredSubs = subsObjPredErr<medianObjPredErr;
 
-goodEstSel = reshape(repmat(goodEstSubs,nTrials-2,1),[],1);
-goodPredSel = reshape(repmat(goodPredSubs,nTrials-4,1),[],1);
+%selects out trials for good subjects for both estimation and prediction
+goodEstSel = reshape(repmat(goodEstSubs,nTrials-2*rejTrialsPerBlock,1),[],1);
+goodPredSel = reshape(repmat(goodPredSubs,nTrials-2*rejTrialsPerBlock-2,1),[],1);
 
 % steps for these loops
 % 1 - preallocate quantile borders
 % 2 - add trials in a quantile to that quantile
 % 3 - find mean error/update for that quantile
 % 4 - repeat until quantiles are filled
-% 5  - repeat whole process for bias and learning for all and good subjects
+% 5 - repeat whole process for bias and learning for all and good subjects
 nBins = 40;
 bordersAllCP = quantile(changepointobjPredErrorAll,nBins-1);
 bordersAllOB = quantile(oddballobjPredErrorAll,nBins-1);
 quantilesAllOB = zeros(size(oddballobjPredErrorAll,1),1);
 quantilesAllCP = zeros(size(changepointobjPredErrorAll,1),1);
 for q = nBins:-1:1
+    %defines everything below a border as in that bin in descending order 
     if q<nBins
         quantilesAllCP(changepointobjPredErrorAll<=bordersAllCP(q)) = q;
         quantilesAllOB(oddballobjPredErrorAll<=bordersAllOB(q)) = q;
@@ -595,6 +690,8 @@ for q = nBins:-1:1
         quantilesAllOB(oddballobjPredErrorAll>bordersAllOB(q-1)) = q;
     end
 end
+%find mean estimation error (y) and objective prediction error (x) for each
+%bin for plotting (Figure 3B)
 for q = 1:nBins
     meanQuantilesCPAllErrBias(q) = mean(changepointEstErrAll(quantilesAllCP==q));
     meanQuantilesOBAllErrBias(q) = mean(oddballEstErrAll(quantilesAllOB==q));
@@ -607,6 +704,7 @@ bordersAllOB = quantile(oddballPredErrorAll,nBins-1);
 quantilesAllOB = zeros(size(oddballPredErrorAll,1),1);
 quantilesAllCP = zeros(size(changepointPredErrorAll,1),1);
 for q = nBins:-1:1
+    %defines everything below a border as in that bin in descending order 
     if q<nBins
         quantilesAllCP(changepointPredErrorAll<=bordersAllCP(q)) = q;
         quantilesAllOB(oddballPredErrorAll<=bordersAllOB(q)) = q;
@@ -615,6 +713,8 @@ for q = nBins:-1:1
         quantilesAllOB(oddballPredErrorAll>bordersAllOB(q-1)) = q;
     end
 end
+%find mean pred update (y) and subjective prediction error (x) for each
+%bin for plotting (Figure 4B)
 for q = 1:nBins
     meanQuantilesCPAllErrLR(q) = mean(changepointPredUpdateAll(quantilesAllCP==q));
     meanQuantilesOBAllErrLR(q) = mean(oddballPredUpdateAll(quantilesAllOB==q));
@@ -622,6 +722,7 @@ for q = 1:nBins
     quantileAllOBxesLR(q) = mean(oddballPredErrorAll(quantilesAllOB==q));
 end
 
+%repeat above process for good subjects (subjects with below median est/pred err) for figures 3C and 4C
 changepointobjPredErrorGood = changepointobjPredErrorAll(goodEstSel);
 oddballobjPredErrorGood = oddballobjPredErrorAll(goodEstSel);
 changepointEstErrGood = changepointEstErrAll(goodEstSel);
@@ -640,6 +741,7 @@ for q = nBins:-1:1
         quantilesGoodOB(oddballobjPredErrorGood>bordersGoodOB(q-1)) = q;
     end
 end
+%These values go into Figure 3C
 for q = 1:nBins
     meanQuantilesCPGoodErrBias(q) = mean(changepointEstErrGood(quantilesGoodCP==q));
     meanQuantilesOBGoodErrBias(q) = mean(oddballEstErrGood(quantilesGoodOB==q));
@@ -666,6 +768,7 @@ for q = nBins:-1:1
         quantilesGoodOB(oddballPredErrorGood>bordersGoodOB(q-1)) = q;
     end
 end
+%These values go into Figure 4C
 for q = 1:nBins
     meanQuantilesCPGoodUpLR(q) = mean(changepointPredUpdateGood(quantilesGoodCP==q));
     meanQuantilesOBGoodUpLR(q) = mean(oddballPredUpdateGood(quantilesGoodOB==q));
@@ -674,6 +777,7 @@ for q = 1:nBins
 end
 
 %calculate subject's standard deviations of errors and add subject's errors to list of all errors made by all subjects
+%These values are used for the supplementary bias figure
 for s = 1:length(behaveSubs)
     subno = behaveSubs(s);
     subNum = num2str(subno);
@@ -682,7 +786,6 @@ for s = 1:length(behaveSubs)
     allData=allData.alldata;
 
     estErrPractice = allData.estErr(21:60,:);
-    estErrStDevs(s) = std(estErrPractice,0,"all");
     estErrPred = allData.estErr(61:300,:);
     predErrPred = allData.predictErr([62:180,182:end],:);
 
@@ -692,9 +795,9 @@ for s = 1:length(behaveSubs)
     stdSubEstPractice(s) = std(estErrPractice,0,'all');
     stdSubEstPred(s) = std(estErrPred,0,'all');
     stdSubPredPred(s) = std(predErrPred,0,'all');
-    meanSubEstPractice(s) = mean(estErrPractice,'all');
-    meanSubEstPred(s) = mean(estErrPred,'all');
-    meanSubPredPred(s) = mean(predErrPred,'all');
+    meanSubEstPractice(s) = mean(abs(estErrPractice),'all');
+    meanSubEstPred(s) = mean(abs(estErrPred),'all');
+    meanSubPredPred(s) = mean(abs(predErrPred),'all');
 end
 numPractice = numel(allEstErrPractice);
 numPred = numel(allEstErrPred);
@@ -710,14 +813,15 @@ predictedVar = 1./((1./varSubPredPred)+(1./varSubEstPractice));
 predictedStd = sqrt(predictedVar);
 
 %plot figure S1
+%panel A practice est err vs task est err
 figure("Position",[250,250,1200,330])
 subplot(1,3,1)
-scatter(stdSubEstPractice,stdSubEstPred,20,[.5,.5,.5],'filled','MarkerEdgeColor','k');
-[h,pEsts] = ttest(stdSubEstPractice-stdSubEstPred);
+scatter(meanSubEstPractice,meanSubEstPred,20,[.5,.5,.5],'filled','MarkerEdgeColor','k');
+[h,pEsts,~,statsEsts] = ttest(meanSubEstPractice-meanSubEstPred);
 hold on
 plot([0,1.22],[0,1.22],"--k","LineWidth",0.25);
-xlabel("Calibration Estimation σ","FontSize",11)
-ylabel("Task Estimation σ","FontSize",11)
+xlabel("Calibration Estimation μ","FontSize",11)
+ylabel("Task Estimation μ","FontSize",11)
 ylim([0,1.22])
 xlim([0,1.22])
 xticks(0:0.5:1.5)
@@ -725,13 +829,14 @@ yticks(0:0.5:1.5)
 set(gca, 'box', 'off')
    set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
 
+%panel B pred err vs task est err
 subplot(1,3,2)
-scatter(stdSubPredPred,stdSubEstPred,20,[.5,.5,.5],'filled','MarkerEdgeColor','k');
-[h,pEstPred,~,stats] = ttest(stdSubPredPred-stdSubEstPred);
+scatter(meanSubPredPred,meanSubEstPred,20,[.5,.5,.5],'filled','MarkerEdgeColor','k');
+[h,pEstPred,~,statsPred] = ttest(meanSubPredPred-meanSubEstPred);
 hold on
 plot([0,1.6],[0,1.6],"--k","LineWidth",0.25);
-xlabel("Task Prediction σ","FontSize",11)
-ylabel("Task Estimation σ","FontSize",11)
+xlabel("Task Prediction μ","FontSize",11)
+ylabel("Task Estimation μ","FontSize",11)
 ylim([0,1.6])
 xlim([0,1.6])
 xticks(0:0.5:1.5)
@@ -739,9 +844,10 @@ yticks(0:0.5:1.5)
    set(gca, 'box', 'off')
     set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
 
+%panel C predicted err based on bayesian combination vs task est err
 subplot(1,3,3)
 scatter(predictedStd,stdSubEstPred,20,[.5,.5,.5],'filled','MarkerEdgeColor','k');
-[h,pModel] = ttest(predictedStd-stdSubEstPred);
+[h,pModel,~,statsModel] = ttest(predictedStd-stdSubEstPred);
 hold on
 plot([0,1],[0,1],"--k","LineWidth",0.25);
 ylabel("Task Estimation σ","FontSize",11)
@@ -771,9 +877,22 @@ else
     figLoc = append(figDir,figName);
     saveas(fig,figLoc)
 end
+%%
+% figure
+% scatter(subsObjPredErrL*180/pi,subsObjPredErrR*180/pi,20,[.5,.5,.5],'filled','MarkerEdgeColor','k');
+% hold on
+% plot([0,max(subsObjPredErrR*180/pi)],[0,max(subsObjPredErrR*180/pi)],'k--')
+% ylabel("Mean Right Prediction Error")
+% xlabel("Mean Left Prediction Error")
+% set(gca, 'box', 'off')
+% set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+
 
 %% Run Behavioral regression
 % preallocate variables for loop
+%This section will generate results for figure 3D and 4D
+%also some of the values used here will be used for other figures
+%i.e behavioral values in oddball pupil figure, and good/bad eeg/pupil plots
 paramsCircUpdateAll=[];
 paramsCircBiasAll  =[];
 
@@ -782,16 +901,17 @@ paramsCircBiasAllModel  =[];
 
 normalizedCoefUpdate=[];
 normalizedCoefBias=[];
-
-allCPUpdate = [];
-allOBUpdate = [];
-allCPsPE = [];
-allOBsPE = [];
-
-noTrial = [1,120,121,240,241,360,361,480];
+%specify which trials will be included in regression
+%Maybe later we'll add an early vs late regression here for learning task?
+if rejTrialsPerBlock == 0
+    noTrial = [1,120,121,240,241,360,361,480];
+else
+    noTrial = [1:rejTrialsPerBlock,120,121:rejTrialsPerBlock+120,240,241:rejTrialsPerBlock+240,360,361:rejTrialsPerBlock+360,480];
+end
 LRTrial = true(480,1);
 LRTrial(noTrial) = false;
 
+%remove initial prediction from model prediction variable so it lines up with the rest
 behaveAll.modelPredCP = behaveAll.maxLikePostMu;
 behaveAll.modelPredCP(1:241:end) = [];
 behaveAll.modelPredOB = behaveAll.maxLikePostC;
@@ -810,7 +930,8 @@ for s=1:length(behaveSubs)
     
     nTrials = 120; %length(behaveAll.block(behaveAll.subNum==subNum))*.5;
 
-    %find subject's model variables
+    %find subject's model variables (separate for cp and ob)
+    %X and Mu are CP variables, B and C are OB variables
     OBpredErrorSubModel = behaveAll.subPredErrorOB(behaveAll.subNum==subNum);
     CPpredErrorSubModel = behaveAll.subPredErrorCP(behaveAll.subNum==subNum);
 
@@ -821,11 +942,17 @@ for s=1:length(behaveSubs)
     OBpredErrorModel = behaveAll.predictionErrorOnB(behaveAll.subNum==subNum);
 
     CPupdateModel = behaveAll.modelPredCP(behaveAll.subNum==subNum);
-    CPupdateModel = [nan;circ_dist(CPupdateModel(2:end),CPupdateModel(1:end-1))];
-%     CPupdateModel = deg2rad(CPupdateModel);
     OBupdateModel = behaveAll.modelPredOB(behaveAll.subNum==subNum);
+
+    %certain run's predictions are in degrees and some are in radians, so
+    %this converts any that are in degrees to radians
+    if max(behaveAll.modelPredCP(behaveAll.subNum==subNum))>100
+        CPupdateModel = deg2rad(CPupdateModel);
+        OBupdateModel = deg2rad(OBupdateModel);
+    end
+    
+    CPupdateModel = [nan;circ_dist(CPupdateModel(2:end),CPupdateModel(1:end-1))];
     OBupdateModel = [nan;circ_dist(OBupdateModel(2:end),OBupdateModel(1:end-1))];
-%     OBupdateModel = deg2rad(OBupdateModel);
 
     %find subject's error/update variables
     OBpredError = [behaveAll.predictErr(behaveAll.subNum==subNum & behaveAll.blockCond==-1,1);behaveAll.predictErr(behaveAll.subNum==subNum & behaveAll.blockCond==-1,2)];
@@ -840,7 +967,8 @@ for s=1:length(behaveSubs)
     perceptualErrorOnX = [behaveAll.estErr(behaveAll.subNum==subNum & behaveAll.blockCond==1,1);behaveAll.estErr(behaveAll.subNum==subNum & behaveAll.blockCond==1,2)];
     perceptualErrorOnB = [behaveAll.estErr(behaveAll.subNum==subNum & behaveAll.blockCond==-1,1);behaveAll.estErr(behaveAll.subNum==subNum & behaveAll.blockCond==-1,2)];
 
-    %find subjects surprise, entropy,  lr, bias, condition
+    %extract subjects surprise, entropy,  lr, bias, condition from
+    %behaveall
     OBsurprise = behaveAll.surpriseOB(behaveAll.subNum==subNum);
     CPsurprise = behaveAll.surpriseCP(behaveAll.subNum==subNum);
     
@@ -869,9 +997,6 @@ for s=1:length(behaveSubs)
     OBsurpriseTrialNum=sum(nansum(behaveAll.surpriseTrial(behaveAll.subNum==subNum & behaveAll.blockCond==-1,:)));
     CPsurpriseTrialNum=sum(nansum(behaveAll.surpriseTrial(behaveAll.subNum==subNum & behaveAll.blockCond==1,:)));
     
-    OBmoveDist=[behaveAll.notMove(behaveAll.subNum==subNum & behaveAll.blockCond==-1,1);behaveAll.notMove(behaveAll.subNum==subNum & behaveAll.blockCond==-1,2)];
-    CPmoveDist=[behaveAll.notMove(behaveAll.subNum==subNum & behaveAll.blockCond==1,1);behaveAll.notMove(behaveAll.subNum==subNum & behaveAll.blockCond==1,2)];
-        
     CPgazeAttention=[behaveAll.CPgazeAttention(behaveAll.subNum==subNum,:)];
     OBgazeAttention=[behaveAll.OBgazeAttention(behaveAll.subNum==subNum,:)];
     
@@ -888,6 +1013,7 @@ for s=1:length(behaveSubs)
     whichParams=[1 1 0 0];
     data.doFit=true;
 
+    %mixture model to calcultate uniform probability
     % data.signedError  --> signed errors (or just angles if not for VWM task)
     % data.signedError_allTargs --> errors computed as if subject were
     % estimating all of the colors in the array (ie colorArray - subject
@@ -908,6 +1034,7 @@ for s=1:length(behaveSubs)
     data.signedError=subModPEobjDiffModel;
     data.signedError_allTargs=[];
     [~,~,~, uniformProbModel]=fit_VWM_mixtureModelTrial(data,whichParams);
+    side = [ones(nBlockTrials,1);ones(nBlockTrials,1)*-1;ones(nBlockTrials,1);ones(nBlockTrials,1)*-1];
 
     if condition==1
         gazeAttention=[CPgazeAttention;OBgazeAttention];
@@ -917,8 +1044,10 @@ for s=1:length(behaveSubs)
         entropy = [nanzscore(OBentropy);nanzscore(CPentropy)];
     end
 
-    % Regression for the Update
+    % Regression for Prediction Update
     % xes and ys for both model and subject based regressions
+    % only differences are condition (OB or CP First) or the fact that the
+    % model is using model prediction errors
     if condition==1
         xes = [ ones(4*nTrials,1), ... %This is one that actually gets used
             ([CPpredErrorSub;OBpredErrorSub]),...
@@ -926,7 +1055,8 @@ for s=1:length(behaveSubs)
             ([CPpredErrorSub;OBpredErrorSub] .* nanzscore([CPsurprise;OBsurprise])),...
             ([CPpredErrorSub;OBpredErrorSub] .* entropy), ...
             ([CPpredErrorSub;OBpredErrorSub] .* condNum), ...
-            ([CPpredErrorSub;OBpredErrorSub] .* nanzscore(round(uniformProb,9)))];
+            ([CPpredErrorSub;OBpredErrorSub] .* nanzscore(round(uniformProb,9))), ...
+            ([CPpredErrorSub;OBpredErrorSub] .* side)];
 
         xes = [xes(:,1),nanzscore(xes(:,2:end))];
         Y=[ CPupdate; OBupdate];
@@ -937,7 +1067,8 @@ for s=1:length(behaveSubs)
             ([CPpredErrorSubModel;OBpredErrorSubModel] .* nanzscore([CPsurprise;OBsurprise])),...
             ([CPpredErrorSubModel;OBpredErrorSubModel] .* entropy), ...
             ([CPpredErrorSubModel;OBpredErrorSubModel] .* condNum), ...
-            ([CPpredErrorSubModel;OBpredErrorSubModel] .* nanzscore(round(uniformProb,9)))];
+            ([CPpredErrorSubModel;OBpredErrorSubModel] .* nanzscore(round(uniformProb,9))), ...
+            ([CPpredErrorSubModel;OBpredErrorSubModel] .* side)];
 
         xesMod = [xesMod(:,1),nanzscore(xesMod(:,2:end))];
         YMod=[ CPupdateModel; OBupdateModel];
@@ -948,7 +1079,8 @@ for s=1:length(behaveSubs)
             ([OBpredErrorSub;CPpredErrorSub] .* nanzscore([OBsurprise;CPsurprise])),...
             ([OBpredErrorSub;CPpredErrorSub] .* entropy), ...
             ([OBpredErrorSub;CPpredErrorSub] .* condNum), ...
-            ([OBpredErrorSub;CPpredErrorSub] .* nanzscore(round(uniformProb,9)))];
+            ([OBpredErrorSub;CPpredErrorSub] .* nanzscore(round(uniformProb,9))), ...
+            ([OBpredErrorSub;CPpredErrorSub] .* side)];
         
         xes = [xes(:,1),nanzscore(xes(:,2:end))];
         Y=[OBupdate; CPupdate];
@@ -959,7 +1091,8 @@ for s=1:length(behaveSubs)
             ([OBpredErrorSubModel;CPpredErrorSubModel] .* nanzscore([OBsurprise;CPsurprise])),...
             ([OBpredErrorSubModel;CPpredErrorSubModel] .* entropy), ...
             ([OBpredErrorSubModel;CPpredErrorSubModel] .* condNum), ...
-            ([OBpredErrorSubModel;CPpredErrorSubModel] .* nanzscore(round(uniformProb,9)))];
+            ([OBpredErrorSubModel;CPpredErrorSubModel] .* nanzscore(round(uniformProb,9))), ...
+            ([OBpredErrorSubModel;CPpredErrorSubModel] .* side)];
         
         xesMod = [xesMod(:,1),nanzscore(xesMod(:,2:end))];
         YMod=[OBupdateModel; CPupdateModel];
@@ -968,8 +1101,8 @@ for s=1:length(behaveSubs)
     %set up data for subject circular regression
     % data.Y              = ydata
     % data.X              = xdata
-    % data.includeUniform = do you want to include a uniform mixture component?
-    % data.whichParams    = which parameters should we fit?
+    % data.includeUniform = do you want to include a uniform mixture component? (yes)
+    % data.whichParams    = which parameters should we fit? (all)
     % data.startPoint     = where should we start parameter search
     % data.lb             = lower bound
     % data.ub             = upper bound
@@ -984,10 +1117,11 @@ for s=1:length(behaveSubs)
     regData.whichParams=logical([ones(1,size(regData.X,2)+1),0]);
     regData.includeUniform=1;
     
-    regData.priorMean=[0,0,0,0,0,0,0];
+    regData.priorMean=[0,0,0,0,0,0,0,0];
     
-    regData.priorWidth=[1,1,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth];
+    regData.priorWidth=[1,1,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth];
 
+    %bounds for concentration are 0.0001-100, bounds for other parameters are LB and UB
     regData.lb=[.0001, ones(1, size(regData.X, 2)).*LB];
     regData.ub=[100, ones(1, size(regData.X, 2)).*UB];
     
@@ -995,6 +1129,8 @@ for s=1:length(behaveSubs)
     regData.Y(nanTrials)=[];
     regData.X(nanTrials,:)=[];
 
+    %parameters for model regression should be the same as the params for
+    %the human regression
     regDataModel = regData;
     regDataModel.X = xesMod;
     regDataModel.Y = YMod;
@@ -1003,15 +1139,8 @@ for s=1:length(behaveSubs)
 
     %runs subject and model-behavior circular error model
     [paramsUpdate, negLogLikeUpdate]=fitLinearModWCircErrs(regData);
-    
-    bestParamsUpdate=paramsUpdate;
-    bestNegLogLikeUpdate=negLogLikeUpdate;
-
     [paramsUpdateModel, negLogLikeUpdateModel]=fitLinearModWCircErrs(regDataModel);
     
-    bestParamsUpdateModel=paramsUpdateModel;
-    bestNegLogLikeUpdateModel=negLogLikeUpdateModel;    
-
     % Regression for Perceptual Error
     % specify xes and ys for human and model
     if condition==1
@@ -1022,7 +1151,8 @@ for s=1:length(behaveSubs)
             ([CPpredError;OBpredError] .* entropy),...
             ([CPpredError;OBpredError] .* condNum), ...
             ([CPpredError;OBpredError] .* nanzscore(round(uniformProb,9))),...
-            ([CPpredError;OBpredError] .* nanzscore(gazeAttention))];
+            ([CPpredError;OBpredError] .* nanzscore(gazeAttention)), ...
+            ([CPpredError;OBpredError] .* side)];
 
         xes = [xes(:,1),nanzscore(xes(:,2:end))];
         Y=[perceptualErrorOnX; perceptualErrorOnB];        
@@ -1034,7 +1164,8 @@ for s=1:length(behaveSubs)
             ([CPpredErrorModel;OBpredErrorModel] .* entropy),...
             ([CPpredErrorModel;OBpredErrorModel] .* condNum), ...
             ([CPpredErrorModel;OBpredErrorModel] .* nanzscore(round(uniformProb,9))),...
-            ([CPpredErrorModel;OBpredErrorModel] .* nanzscore(gazeAttention))];
+            ([CPpredErrorModel;OBpredErrorModel] .* nanzscore(gazeAttention)), ...
+            ([CPpredErrorModel;OBpredErrorModel] .* side)];
 
         xesMod = [xesMod(:,1),nanzscore(xesMod(:,2:end))];
         YMod=[perceptualErrorOnXModel; perceptualErrorOnBModel];
@@ -1047,7 +1178,8 @@ for s=1:length(behaveSubs)
             ([OBpredError;CPpredError] .* entropy),...
             ([OBpredError;CPpredError] .* condNum), ...
             ([OBpredError;CPpredError] .* nanzscore(round(uniformProb,9))),...
-            ([OBpredError;CPpredError] .* nanzscore(gazeAttention))];
+            ([OBpredError;CPpredError] .* nanzscore(gazeAttention)), ...
+            ([OBpredError;CPpredError] .* side)];
 
         xes = [xes(:,1),nanzscore(xes(:,2:end))];
         Y=[perceptualErrorOnB; perceptualErrorOnX];        
@@ -1059,13 +1191,14 @@ for s=1:length(behaveSubs)
             ([OBpredErrorModel;CPpredErrorModel] .* entropy),...
             ([OBpredErrorModel;CPpredErrorModel] .* condNum), ...
             ([OBpredErrorModel;CPpredErrorModel] .* nanzscore(round(uniformProb,9))),...
-            ([OBpredErrorModel;CPpredErrorModel] .* nanzscore(gazeAttention))];
+            ([OBpredErrorModel;CPpredErrorModel] .* nanzscore(gazeAttention)),...
+            ([OBpredErrorModel;CPpredErrorModel] .* side)];
 
         xesMod = [xesMod(:,1),nanzscore(xesMod(:,2:end))];
         YMod=[perceptualErrorOnBModel; perceptualErrorOnXModel];
     end
       
-    %fill regData for circular models
+    %fill regData for circular models (see explanation of parameters above in prediction update model)
     regData.X=xes;
     regData.Y=Y;
 
@@ -1073,8 +1206,8 @@ for s=1:length(behaveSubs)
     regData.whichParams=logical([ones(1,size(regData.X,2)+1),0]);
     regData.includeUniform=1;
     
-    regData.priorMean=[0,0,0,0,0,0,0,0];
-    regData.priorWidth=[1,1,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth];
+    regData.priorMean=[0,0,0,0,0,0,0,0,0];
+    regData.priorWidth=[1,1,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth,narrowWidth];
 
     regData.lb=[.0001, ones(1, size(regData.X, 2)).*LB];
     regData.ub=[100, ones(1, size(regData.X, 2)).*UB];
@@ -1091,27 +1224,17 @@ for s=1:length(behaveSubs)
 
 
     %run circular models
-    [paramsBias, negLogLikeBias]=fitLinearModWCircErrs(regData);
-    
-    bestParamsBias=paramsBias;
-    bestNegLogLikeBias=negLogLikeBias;       
-        
+    [paramsBias, negLogLikeBias]=fitLinearModWCircErrs(regData);        
     [paramsBiasModel, negLogLikeBiasModel]=fitLinearModWCircErrs(regDataModel);
-    
-    bestParamsBiasModel=paramsBiasModel;
-    bestNegLogLikeBiasModel=negLogLikeBiasModel;    
 
     % Saving coefficient values
-    paramsCircUpdateAll=cat(1,paramsCircUpdateAll,bestParamsUpdate);
-    paramsCircBiasAll=cat(1,paramsCircBiasAll,bestParamsBias);        
-    paramsCircUpdateAllModel=cat(1,paramsCircUpdateAllModel,bestParamsUpdateModel);
-    paramsCircBiasAllModel=cat(1,paramsCircBiasAllModel,bestParamsBiasModel);
-    
-    allCPsPE = [allCPsPE;CPpredErrorSubModel];
-    allOBsPE = [allOBsPE;OBpredErrorSubModel];
-    allCPUpdate = [allCPUpdate;CPupdateModel];
-    allOBUpdate = [allOBUpdate;OBupdateModel];
+    paramsCircUpdateAll=cat(1,paramsCircUpdateAll,paramsUpdate);
+    paramsCircBiasAll=cat(1,paramsCircBiasAll,paramsBias);        
+    paramsCircUpdateAllModel=cat(1,paramsCircUpdateAllModel,paramsUpdateModel);
+    paramsCircBiasAllModel=cat(1,paramsCircBiasAllModel,paramsBiasModel);
 end
+
+%calculate p values for distributions of human coefficients for both models
 for i = 1:size(paramsCircUpdateAll,2)
 [~,pUp(i),~,statsUp] = ttest(paramsCircUpdateAll(:,i));
 tStatUp(i) =  statsUp.tstat;
@@ -1124,11 +1247,11 @@ end
 %% Step 2: Load EEG/eye data & run regression
 % Raw EEG data regression
 if runEEGRegression == 1
-    for s=1:length(EEGSubs)
+    for s = 1:length(EEGSubs)
         subno=EEGSubs(s);
         subNum=num2str(subno);
         disp(subNum)
-        resultEEG=eeg_analysisFunc(subNum,saveText,dirs);
+        resultEEG=eeg_analysisFunc(subNum,saveText,dirs,rejEarlyTrials);
         b_mat_eeg(s,:,:,:)=resultEEG.mat; %subject by channel by trial by regressor
     end
     saveDir=[basePath];
@@ -1142,20 +1265,31 @@ for s=1:length(eyeSubs)
     subno=eyeSubs(s);
     subNum=num2str(subno);
     disp(subNum)
-    resultEye=eyeRegressionFunc(subNum,saveText,timeBeforeEye,timeAfterEye,blinkWindow,baselineTimeEye,dirs);
-    resultEyePred=eyeRegressionPredResp(subNum,saveText,timeBeforePred,timeAfterPred,blinkWindow,baselineTimeStart,baselineTimeEnd,dirs);
+
+    %2 eye regressions, first for stimulus phase, second for prediction phase
+    resultEye=eyeRegressionFunc(subNum,saveText,timeBeforeEye,timeAfterEye,blinkWindow,baselineTimeEye,dirs,rejEarlyTrials);
+    resultEyePred=eyeRegressionPredResp(subNum,saveText,timeBeforePred,timeAfterPred,blinkWindow,baselineTimeStart,baselineTimeEnd,dirs,rejEarlyTrials);
+    
+    %saves coefs for stim regression on pupil size and baseline effects
     allBs(:,:,s) = resultEye.B;
     BBaseline(s,:) = resultEye.BBaseline;
+    
+    %saves coefs for prediction regression on pupil size and pupil derivative
     allBsPred(:,:,s) = resultEyePred.B;
     allDiffBsPred(:,:,s) = resultEyePred.diffB;
 end
+
+%permute from coef x timepoint x subs to subs x timepoint x coef
 allBsPerm = permute(allBs,[3,2,1]);
 allBsPredPerm = permute(allBsPred,[3,2,1]);
 allBsDiffPerm = permute(allDiffBsPred,[3,2,1]);
 
 %% Clustering/Permutation Test
+%specify variables for permutation test (can remove these lines and specify
+%above as well, but I spend a lot of time here messing with these numbers)
 clustThreshEEG = 0.01;
 clustThreshEye = 0.025;
+connectThresh = 0.40;
 %load channel locations
 load("chanlocs.mat")
 
@@ -1176,8 +1310,7 @@ load("chanlocs.mat")
         relDist(:,i)=sqrt(sum((allLocas-repmat(allLocas(i,:), length(allLocas), 1)).^2, 2));
     end
     
-    % Set a threshold on distance... and mark channels that fall within that
-    % threshold:
+    % Set a threshold on distance... and mark channels that fall within that threshold:
     connectionMat=relDist<connectThresh;
     connectionMat=connectionMat-eye(length(connectionMat));
     
@@ -1188,11 +1321,11 @@ load("chanlocs.mat")
     %close all
 
 % end
-% STEP 1b: compute t-stats
+% STEP 1b: compute t-stats at each channel/time point and define clusters
 regDat = b_mat_eeg(:,:,:,:);
 EEG_dat=regDat(:,:,:,2);
 % get clusters, cluster sizes, cluster masses for positive clusters (ie
-% p<.05 in a one tailed positive test):
+% p<CkustThreshEEG in a one tailed positive test):
 posClusterInfo=getEEG_clusterSize(EEG_dat, connectionMat, clustThreshEEG, 'right');
 % and negative effects:  
 negClusterInfo=getEEG_clusterSize(EEG_dat, connectionMat, clustThreshEEG, 'left');         
@@ -1231,17 +1364,24 @@ end
 % For a two tailed test, find the the minimum cluster statistics necessary
 % to beat 97.5% of the null distribution, based on "mass"
 massTh = prctile(maxWt,  97.5);
-gPosEEG=unique(posClusterInfo.ID_map(posClusterInfo.clustWtMap	>massTh));
-gNegEEG=unique(negClusterInfo.ID_map(negClusterInfo.clustWtMap	>massTh));
+%find positive and negative cluster IDs with weights greater than threshold
+gPosEEG=unique(posClusterInfo.ID_map(posClusterInfo.clustWtMap > massTh));
+gNegEEG=unique(negClusterInfo.ID_map(negClusterInfo.clustWtMap > massTh));
+%make new "threshMap" which just has the t values of significant clusters and zeros everywhere else
 threshMapEEG=zeros(size(negClusterInfo.tMap));
-threshMapEEG(posClusterInfo.clustWtMap	>massTh)=posClusterInfo.tMap(posClusterInfo.clustWtMap	>massTh);
-threshMapEEG(negClusterInfo.clustWtMap	>massTh)=negClusterInfo.tMap(negClusterInfo.clustWtMap	>massTh);
+threshMapEEG(posClusterInfo.clustWtMap > massTh)=posClusterInfo.tMap(posClusterInfo.clustWtMap > massTh);
+threshMapEEG(negClusterInfo.clustWtMap > massTh)=negClusterInfo.tMap(negClusterInfo.clustWtMap > massTh);
 
-clustMasses = [unique(posClusterInfo.clustWtMap(posClusterInfo.clustWtMap>massTh),'stable');unique(negClusterInfo.clustWtMap(negClusterInfo.clustWtMap>massTh),'stable')];
+%save cluster masses and cluster pValues
+clustMasses = [unique(posClusterInfo.clustWtMap(posClusterInfo.clustWtMap > massTh),'stable');unique(negClusterInfo.clustWtMap(negClusterInfo.clustWtMap > massTh),'stable')];
 clear pVal
 for k = 1:length([gPosEEG;gNegEEG])
     pVal(k) = (sum(maxWt>clustMasses(k))+1)/numPermEEG;
 end
+
+%image plot of threshMap (shows significant eeg clusters and their tvalues)
+figure
+imagesc(threshMapEEG);
 
 %% repeats permutation test for eye data
 % 1 - surprise @ clustThreshEye for analysis
@@ -1256,6 +1396,12 @@ for i = 1:size(allBsPerm,3)
 end
 
 % same steps as previous test, with possibly more permutations since this goes a lot faster
+% 5 clusters calculated
+% 1. stimulus STP regression thresholded at clustThreshEye
+% 2. stimulus STP regression thresholed at 0.025
+% 3. stimulus entropy regression thresholded at 0.025
+% 4. prediction phase STPCPOB thresholded at 0.025
+% 5. prediction phase derivative STPCPOB thresholded at 0.025
 clusterMaxPerm=zeros(numPermEye,1);
 clusterMaxPermSig=zeros(numPermEye,1);
 clusterMaxPermEnt=zeros(numPermEye,1);
@@ -1286,7 +1432,7 @@ for i=1:numPermEye
     random_flip_mat = random_flip'*ones(1,size(allBsDiffPerm,2));
     data_flippedDiffSTP = random_flip_mat.*allBsDiffSTP;
 
-    %calculate 15 t stats for permuted data
+    %calculate t stats for permuted data
     pupilClusterInfo = getPupil_clusterSize(data_flippedVar,0,clustThreshEye,'right');
     clusterMaxPerm(i) = max(pupilClusterInfo.clustWtMap);
     pupilClusterInfo = getPupil_clusterSize(data_flippedVar,0,sigThresh,'right');
@@ -1303,7 +1449,7 @@ for i=1:numPermEye
 end
 
 
-% calculate cluster size of real data
+% calculate cluster size of real data and the pValues for those clusters
 pupilClusterInfo = getPupil_clusterSize(allBsVar,0,clustThreshEye*2,'both');
 clusterMax = max(pupilClusterInfo.clustWtMap);
 
@@ -1324,7 +1470,7 @@ clusterMaxDiffSTP = max(pupilClusterInfoDiffSTP.clustWtMap);
 pValDiffSTP = (sum(clusterMaxPermDiffSTP>=clusterMaxDiffSTP)+1)/numPermEye*2;
 
 %find mass threshold and get clusters where data is larger than threshold
-%for the 2nd 3rd and 4th, get a map of where cluster size is significantly large
+%for the 2nd 3rd 4th, and 5th get a map of where cluster size is significantly large
 massThEye=prctile(clusterMaxPerm, 97.5);
 gSig=unique(pupilClusterInfo.ID_map(pupilClusterInfo.clustWtMap>massThEye));
 threshMapEye=zeros(size(pupilClusterInfo.tMap));
@@ -1335,6 +1481,31 @@ gSigSig=unique(pupilClusterInfoSig.ID_map(pupilClusterInfoSig.clustWtMap>massThS
 threshMapEyeSig=zeros(size(pupilClusterInfoSig.tMap));
 threshMapEyeSig(pupilClusterInfoSig.clustWtMap>massThSig)=pupilClusterInfoSig.tMap(pupilClusterInfoSig.clustWtMap>massThSig);
 sigTimes = find(threshMapEyeSig~=0);
+
+%IF THERE ARE NO CLUSTERS IN EYE STP REGRESSION (as is the case in new dataset):
+%analyses further in the script wouldn't work, so we'll just pretend that pupil 
+%size is significant in roughly the same window as it was in the first dataset (700ms-4sec)
+if isempty(sigTimes)
+    if realData == 1
+        sigTimes = 1700:5000;
+        pupilClusterInfo.ID_map(1700:5000)=1000;
+        pupilClusterInfo.clustWtMap(1700:5000)=3401;
+        pupilClusterInfo.tMap(1700:5000)=1;
+        gSig=unique(pupilClusterInfo.ID_map(pupilClusterInfo.clustWtMap>massThEye));
+        threshMapEye=zeros(size(pupilClusterInfo.tMap));
+        threshMapEye(pupilClusterInfo.clustWtMap>massThEye)=pupilClusterInfo.tMap(pupilClusterInfo.clustWtMap>massThEye);
+    else
+        sigTimes = 283:1251;
+        pupilClusterInfo.ID_map(283:1251)=1000;
+        pupilClusterInfo.clustWtMap(283:1251)=3000;
+        pupilClusterInfo.tMap(283:1251)=1;
+        gSig=unique(pupilClusterInfo.ID_map(pupilClusterInfo.clustWtMap>massThEye));
+        threshMapEye=zeros(size(pupilClusterInfo.tMap));
+        threshMapEye(pupilClusterInfo.clustWtMap>massThEye)=pupilClusterInfo.tMap(pupilClusterInfo.clustWtMap>massThEye);
+    end
+end
+
+%other regression coefficients can be insignificant, those figures will just be skipped
 
 massThEnt=prctile(clusterMaxPermEnt, 97.5);
 gSigEnt=unique(pupilClusterInfoEnt.ID_map(pupilClusterInfoEnt.clustWtMap>massThEnt));
@@ -1354,13 +1525,18 @@ threshMapEyeDiffSTP=zeros(size(pupilClusterInfoDiffSTP.tMap));
 threshMapEyeDiffSTP(pupilClusterInfoDiffSTP.clustWtMap>massThDiffSTP)=pupilClusterInfoDiffSTP.tMap(pupilClusterInfoDiffSTP.clustWtMap>massThDiffSTP);
 sigTimesDiffSTP = find(threshMapEyeDiffSTP~=0);
 
-figure
-imagesc(threshMapEEG);
 
-%% Make big summary figure
-panel12 = [1:4,13:16,25:28,37:40,49:52,61:64];
-panel22a = [6:12,18:24,30:36];
-panel22b = [42:48,54:60,66:72];
+
+%% Make big summary figure (figure 2 in manuscript)
+% panel12 = [1:4,13:16,25:28,37:40,49:52,61:64];
+% panel22a = [6:12,18:24,30:36];
+% panel22b = [42:48,54:60,66:72];
+
+%these are coordinates of each of the panel's locations in figure
+%it is very convoluted, do not edit
+panel12 = [9:12,21:24,33:36,45:48,57:60,69:72];
+panel22a = [1:7,13:19,25:31];
+panel22b = [37:43,49:55,61:67];
 panel32 = [97:99,109:111,121:123];
 panel42 = [100:102,112:114,124:126];
 panel52 = [103:105,115:117,127:129];
@@ -1388,7 +1564,7 @@ subplot(19,12,panel12);
     errorbar(3,mean(BBaseline(:,2)),sem(2),'.',"Color",cbColors(5,:),"MarkerSize",20,"Marker",'.',"LineWidth",2)
     errorbar(4,mean(BBaseline(:,3)),sem(3),'.',"Color",cbColors(4,:),"MarkerSize",20,"Marker",'.',"LineWidth",2)
     yline(0)
-    yticks([0])
+    yticks([-.1,0,.05])
     set(gca,"FontName","Arial","FontWeight","bold","FontSize",12)
     set(gca, 'box', 'off')
     ylabel("Regression Coefficient")
@@ -1404,8 +1580,8 @@ subplot(19,12,panel22b);
         shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,3)),[mean(allBsPerm(:,:,3))-sem;mean(allBsPerm(:,:,3))+sem],{'-','color',cbColors(4,:),'markerfacecolor',cbColors(4,:)},1)
         sem = std(allBsPerm(:,:,4))./sqrt(length(eyeSubs)-1);
         shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,4)),[mean(allBsPerm(:,:,4))-sem;mean(allBsPerm(:,:,4))+sem],{'-','color',cbColors(2,:),'markerfacecolor',cbColors(2,:)},1)
-        sem = std(allBsPerm(:,:,5))./sqrt(length(eyeSubs)-1);
-        shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,5)),[mean(allBsPerm(:,:,5))-sem;mean(allBsPerm(:,:,5))+sem],{'-','color',cbColors(3,:),'markerfacecolor',cbColors(3,:)},1)
+        % sem = std(allBsPerm(:,:,5))./sqrt(length(eyeSubs)-1);
+        % shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,5)),[mean(allBsPerm(:,:,5))-sem;mean(allBsPerm(:,:,5))+sem],{'-','color',cbColors(3,:),'markerfacecolor',cbColors(3,:)},1)
     else
         sem = std(allBsPerm(:,:,2))./sqrt(length(eyeSubs)-1);
         shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,2)),[mean(allBsPerm(:,:,2))-sem;mean(allBsPerm(:,:,2))+sem],{'-','color',cbColors(5,:),'markerfacecolor',cbColors(5,:)},1)
@@ -1414,40 +1590,49 @@ subplot(19,12,panel22b);
         shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,3)),[mean(allBsPerm(:,:,3))-sem;mean(allBsPerm(:,:,3))+sem],{'-','color',cbColors(4,:),'markerfacecolor',cbColors(4,:)},1)
         sem = std(allBsPerm(:,:,4))./sqrt(length(eyeSubs)-1);
         shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,4)),[mean(allBsPerm(:,:,4))-sem;mean(allBsPerm(:,:,4))+sem],{'-','color',cbColors(2,:),'markerfacecolor',cbColors(2,:)},1)
-        sem = std(allBsPerm(:,:,5))./sqrt(length(eyeSubs)-1);
-        shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,5)),[mean(allBsPerm(:,:,5))-sem;mean(allBsPerm(:,:,5))+sem],{'-','color',cbColors(3,:),'markerfacecolor',cbColors(3,:)},1)
+        % sem = std(allBsPerm(:,:,5))./sqrt(length(eyeSubs)-1);
+        % shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,5)),[mean(allBsPerm(:,:,5))-sem;mean(allBsPerm(:,:,5))+sem],{'-','color',cbColors(3,:),'markerfacecolor',cbColors(3,:)},1)
     end
-    % the part where you add significant clusters to figure
-    if ~isempty(sigTimes)
-        scatter((sigTimes-timeBeforeEye-1)/1000,mean(allBsPerm(:,sigTimes,2)),5,[0.1621    0.3301    0.1992],"filled")
-    end
-    if ~isempty(sigTimesEnt)
-        scatter((sigTimesEnt-timeBeforeEye-1)/1000,mean(allBsPerm(:,sigTimesEnt,4)),5,[0.6289    0.4348         0],"filled") 
+    % the part where you add significant clusters to figure if present
+    if realData==1
+        if ~isempty(sigTimes)
+            scatter((sigTimes-timeBeforeEye-1)/1000,mean(allBsPerm(:,sigTimes,2)),5,[0.1621    0.3301    0.1992],"filled")
+        end
+        if ~isempty(sigTimesEnt)
+            scatter((sigTimesEnt-timeBeforeEye-1)/1000,mean(allBsPerm(:,sigTimesEnt,4)),5,[0.6289    0.4348         0],"filled") 
+        end
     end
 
     xlabel('Time Relative to Stimulus Onset (s)')
     ylabel('Coefficients')
     xticks([-1:4])
     xlim([-1,4])
-    yticks([0])
+    yticks([-0.02,0,0.04])
     yline(0)
     xline(0) 
     set(gca,"FontName","Arial","FontWeight","bold","FontSize",12)
     set(gca, 'box', 'off')
 
 subplot(19,12,panel22a);
-%Running pupil intercept
-    sem = std(allBsPerm(:,:,1))./sqrt(length(eyeSubs)-1);
-    shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,1)),[mean(allBsPerm(:,:,1))-sem;mean(allBsPerm(:,:,1))+sem],{'-','color',[.5,.5,.5],'markerfacecolor',[.5,.5,.5]},1)
+%Running pupil intercept (mean pupil signal) with error bars
+    if realData==1
+        sem = std(allBsPerm(:,:,1))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./1000,mean(allBsPerm(:,:,1)),[mean(allBsPerm(:,:,1))-sem;mean(allBsPerm(:,:,1))+sem],{'-','color',[.5,.5,.5],'markerfacecolor',[.5,.5,.5]},1)
+    else
+        sem = std(allBsPerm(:,:,1))./sqrt(length(eyeSubs)-1);
+        shadedErrorBar((-timeBeforeEye:timeAfterEye)./250,mean(allBsPerm(:,:,1)),[mean(allBsPerm(:,:,1))-sem;mean(allBsPerm(:,:,1))+sem],{'-','color',[.5,.5,.5],'markerfacecolor',[.5,.5,.5]},1)
+    end
     ylabel('Intercept')
     xticks([])
     xlim([-1,4])
-    yticks([0])
+    yticks([-0.25,0,0.4])
     yline(0)
     xline(0) 
     set(gca,"FontName","Arial","FontWeight","bold","FontSize",12)
     set(gca, 'box', 'off')
 
+    %next 4 panels are each a topoplot of STP coefficient at a specific timepoint
+    %320 ms, 450 ms, 580 ms, and 1000 ms
 subplot(19,12,panel32);
 %topoplot 1
     currplot = topoplot(clusterInfo.tMap(:,EEGTimes==319), chanlocs,'Colormap',jet);
@@ -1497,12 +1682,13 @@ subplot(19,12,panel72);
     mat3 = mat2';
     mat4 = reshape(mean(mat1,2),size(b_mat_eeg,[1,3,4]));
 
+%next 4 plots are running coefficients for individual channels (FCz and Pz) for intercept and STP
 subplot(19,12,panel82);
 %intercept plot (FCz)
     sem = std(mat4(:,:,1))./sqrt(size(b_mat_eeg,1)-1);
     shadedErrorBar(traceTimes./1000,movmean(mat3(1,traceTimes+timeBeforeEEG),40),[movmean(mat3(1,traceTimes+timeBeforeEEG),40)-sem(traceTimes+timeBeforeEEG);movmean(mat3(1,traceTimes+timeBeforeEEG),40)+sem(traceTimes+timeBeforeEEG)],{'b-','markerfacecolor','b'},1)
     yline(0,'--')
-    yticks(0)
+    yticks(-2:1)
     xlim([-0.5,1.5])
     xticks([])
     ylabel("Intercept")
@@ -1515,7 +1701,7 @@ subplot(19,12,panel92);
     sem = std(mat4(:,:,2))./sqrt(size(b_mat_eeg,1)-1);
     shadedErrorBar(traceTimes./1000,movmean(mat3(2,traceTimes+timeBeforeEEG),40),[movmean(mat3(2,traceTimes+timeBeforeEEG),40)-sem(traceTimes+timeBeforeEEG);movmean(mat3(2,traceTimes+timeBeforeEEG),40)+sem(traceTimes+timeBeforeEEG)],{'b-','markerfacecolor','b'},1)
     yline(0,'--')
-    yticks(0)
+    yticks(-0.2:0.1:0.3)
     xlim([-0.5,1.5])
     xticks(-0.5:0.5:1.5)
     xtickangle(0)
@@ -1534,7 +1720,7 @@ subplot(19,12,panel102);
     sem = std(mat4(:,:,1))./sqrt(size(b_mat_eeg,1)-1);
     shadedErrorBar(traceTimes./1000,movmean(mat3(1,traceTimes+timeBeforeEEG),40),[movmean(mat3(1,traceTimes+timeBeforeEEG),40)-sem(traceTimes+timeBeforeEEG);movmean(mat3(1,traceTimes+timeBeforeEEG),40)+sem(traceTimes+timeBeforeEEG)],{'b-','markerfacecolor','b'},1)
     yline(0,'--')
-    yticks(0)
+    yticks(-2:3)
     xlim([-0.5,1.5])
     xticks([])
     ylabel("Intercept")
@@ -1547,7 +1733,7 @@ subplot(19,12,panel112);
     sem = std(mat4(:,:,2))./sqrt(size(b_mat_eeg,1)-1);
     shadedErrorBar(traceTimes./1000,movmean(mat3(2,traceTimes+timeBeforeEEG),40),[movmean(mat3(2,traceTimes+timeBeforeEEG),40)-sem(traceTimes+timeBeforeEEG);movmean(mat3(2,traceTimes+timeBeforeEEG),40)+sem(traceTimes+timeBeforeEEG)],{'b-','markerfacecolor','b'},1)
     yline(0,'--')
-    yticks(0)
+    yticks(-0.3:0.1:0.3)
     xlim([-0.5,1.5])
     xticks(-0.5:0.5:1.5)
     xtickangle(0)
@@ -1576,6 +1762,7 @@ else
 end
 
 %% Make Figure 5 (oddball pupil)
+%only runs if there is a significant oddball pupil cluster
 if ~isempty(sigTimesPredSTP)
     if oddballFigNewVer == 1
         figure('Position',[200 250 1300 600])
@@ -1592,7 +1779,7 @@ if ~isempty(sigTimesPredSTP)
         scatter((sigTimesPredSTP-timeBeforePred-1)./1000,mean(allBsPredPerm(:,sigTimesPredSTP,3)),5,[0.5004    0.2352    0.5469],"filled") 
         xlabel("Time Relative to Prediction (s)")
         xticks([-2,0,2,4])
-        yticks([0])
+        yticks([-0.02,0,0.02])
         yline(0)
         xline(0)
         ylim([-0.021,0.021])
@@ -1602,6 +1789,7 @@ if ~isempty(sigTimesPredSTP)
         set(gca,"FontName","Arial","FontWeight","bold","FontSize",16)
         set(gca, 'box', 'off')
     
+    %second panel is coefficient of learning regression correlated with mean STPCPOB coefficient in prediction phase
     if oddballFigNewVer == 1
         subplot(1,2,2)
     %     meanResponse = mean(allBsPredPerm(:,timeBeforePred-1500:timeBeforePred-800,:),2);
@@ -1612,7 +1800,7 @@ if ~isempty(sigTimesPredSTP)
         set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
         ylabel("Eye STP*CP/OB Coefficient");
         xlabel("Behavioral PE*STP*CP/OB Coef");
-        yticks(0)
+        yticks(-0.1:0.05:0.1)
         xticks(0)
         maxVal = max(paramsCircUpdateAll(ismember(behaveSubs,eyeSubs),4));
         minVal = min(paramsCircUpdateAll(ismember(behaveSubs,eyeSubs),4));
@@ -1626,6 +1814,8 @@ if ~isempty(sigTimesPredSTP)
         plot((linspace(min(paramsCircUpdateAll(ismember(behaveSubs,eyeSubs),4)),max(paramsCircUpdateAll(ismember(behaveSubs,eyeSubs),4)),2)),mOdd(1)*(linspace(min(paramsCircUpdateAll(ismember(behaveSubs,eyeSubs),4)),max(paramsCircUpdateAll(ismember(behaveSubs,eyeSubs),4)),2))+mOdd(2),'Color',[200 50 200]./255);
     end
     [eyeCorr,eyeCorrP] = corr(paramsCircUpdateAll(ismember(behaveSubs,eyeSubs),4),meanResponse(:,3),"Type","spearman");
+    % displays r for correlation between STPCPOB in eye and behavior
+    % and displayes the p value for that correlation
     disp(eyeCorr)
     disp(eyeCorrP)
     %save Figure 5 (oddball 2nd transition in pupil figure)
@@ -1651,7 +1841,7 @@ end
 %% Make Figure S3 (oddball pupil Derivative)
 figure('Position',[400 250 700 600])
 set(gcf,'renderer','Painters')
-
+    % plot mean and sem STPCPOB coefficient for pupil derivative
     sem = std(allBsDiffPerm(:,:,3))./sqrt(length(eyeSubs)-1);
     shadedErrorBar((-timeBeforePred:timeAfterPred)./1000,(mean(allBsDiffPerm(:,:,3))),[(mean(allBsDiffPerm(:,:,3)))-sem;(mean(allBsDiffPerm(:,:,3)))+sem],{'-','color',cbColors(4,:),'markerfacecolor',cbColors(4,:)},1)
     hold on
@@ -1659,7 +1849,7 @@ set(gcf,'renderer','Painters')
     scatter((sigTimesDiffSTP-timeBeforePred-1)./1000,mean(allBsDiffPerm(:,sigTimesDiffSTP,3)),5,[0.5004    0.2352    0.5469],"filled") 
     xlabel("Time Relative to Prediction (s)")
     xticks([-2,0,2,4])
-    yticks([0])
+    yticks([-0.003:0.001:0.003])
     yline(0)
     xline(0)
     ylim([-0.002,0.002])
@@ -1701,7 +1891,6 @@ if ~isempty(gSig)
      
     for k = 1:length(gSig)
         clustTs=relROIEye.maps(:,:,k).*abs(pupilClusterInfo.tMap);
-        [relROIEye.peakChannel(k),J] = find(clustTs==max(clustTs(:)));
     end
     relROIEye.fullTMap=pupilClusterInfo.tMap;
     
@@ -1720,11 +1909,16 @@ if ~isempty(gSig)
      
     for k = 1:length(relROIEEG.sign)
         clustTs=relROIEEG.maps(:,:,k).*abs(posClusterInfo.tMap);
-        [relROIEEG.peakChannel(k),J] = find(clustTs==max(clustTs(:)));
+        % [relROIEEG.peakChannel(k),J] = find(clustTs==max(clustTs(:)));
     end
     %
     relROIEEG.fullTMap=posClusterInfo.tMap;
     
+    if exist('relROIEEG.maps','var') == 0
+        relROIEEG.maps = false(size(relROIEEG.fullTMap,1),size(relROIEEG.fullTMap,2),1);
+        relROIEEG.maps([2,3,6,7,27,28,29,31,33,34,35,36,57,59,60,61,62,63],2300:2500)=true; 
+    end
+
     if eegTimestepMode == 1
         % Instead of using the clusters, you can use regions of clusters or regions of timepoints
         
@@ -1734,7 +1928,7 @@ if ~isempty(gSig)
     %     relROIEEG.maps([3,4,5,6,8,9,10,11,14,15,32,33,36,37,38,40,41,42,44,45,46],:) = 1; %Lefts
     %     relROIEEG.maps([19,20,21,22,24,25,26,27,29,30,48,49,50,53,54,55,57,58,59,60,61],:) = -1; %Rights
     %     relROIEEG.maps = ones(size(relROIEEG.fullTMap,1),size(relROIEEG.fullTMap,2)); %All
-        relROIEEG.maps([2,3,6,7,27,28,29,31,33,34,35,36,57,59,60,61,62,63,12 13 14 19 23 42 43 44 46 47 48 50 51 52 53],:) = 1; %Frontal & Parietal
+        % relROIEEG.maps([2,3,6,7,27,28,29,31,33,34,35,36,57,59,60,61,62,63,12 13 14 19 23 42 43 44 46 47 48 50 51 52 53],:) = 1; %Frontal & Parietal
         relROIEEG.maps = sum(relROIEEG.maps,3);
         %relROI.maps = relROI.fullTMap;
         
@@ -1784,13 +1978,19 @@ if ~isempty(gSig)
     allContext = nan(nTrials,1,length(behaveSubs));
     allRegLRs = nan(nTrials,1,length(behaveSubs));
     allRegBias = nan(nTrials,1,length(behaveSubs));
+    allMaxBias = nan(nTrials,1,length(behaveSubs));
     allContextAll = nan(nTrials,1,length(behaveSubs));
     allRegLRsAll = nan(nTrials,1,length(behaveSubs));
     allRegBiasAll = nan(nTrials,1,length(behaveSubs));
+    allMaxBiasAll = nan(nTrials,1,length(behaveSubs));
     allIndivRegLRs = nan(nTrials,1,length(behaveSubs));
     allIndivRegBias = nan(nTrials,1,length(behaveSubs));
     allIndivRegLRsAll = nan(nTrials,1,length(behaveSubs));
     allIndivRegBiasAll = nan(nTrials,1,length(behaveSubs));
+    allMaxPredErr = nan(nTrials,1,length(behaveSubs));
+    allMaxPredErrAll = nan(nTrials,1,length(behaveSubs));
+    allRejTrials = nan(nTrials,1,length(behaveSubs));
+    allRejTrialsAll = nan(nTrials,1,length(behaveSubs));
     allDoEye = zeros(length(behaveSubs),1);
     allDoEEG = zeros(length(behaveSubs),1);
     allDoEyeEEG = zeros(length(behaveSubs),1);
@@ -1821,16 +2021,14 @@ if ~isempty(gSig)
         if doEEG == 1
             %load eeg data
             eegDat = load(fullfile([eegDir,subNum,'_ALP_FILT_STIM.mat']));
-            if ismember(subno,[2046,2047,2063,2086,2071,2073,2090,2094,2099,2104])
+            if ismember(subno,[2046,2047,2063,2086,2071,2073,2090,2094,2099,2104,4029,4031,4040])
             eegDat.epochNumbers = eegDat.epochNumbers - 1;
             disp(subno)
             end
     
             %define "good" trials for EEG (after practice and non-rejected)
             isGoodEEG = false(size(eegDat.EEG.data,3),1);
-            validEEG = false(size(eegDat.EEG.data,3),1);
             ind_OBCPstart=find(eegDat.epochNumbers>nPracticeTrials,1); %practice 20, random 40
-            validEEG(ind_OBCPstart:end) = true;
             epochNumbers = eegDat.epochNumbers;
             epoch_OBCP=epochNumbers(ind_OBCPstart:end);
         end
@@ -1846,10 +2044,10 @@ if ~isempty(gSig)
                eyeData(:,5:7)=eyeData(:,2:4);
             end
             %Remove bad eye from data with one bad eye
-            if ismember(subno,[2030,2063])
+            if ismember(subno,[2030,2063,3014,4002,4021,4024])
                 eyeData(:,2:4)=eyeData(:,5:7);
             end
-            if ismember(subno,[2035 2057 2058 2062 2071 2083 2087 2098 2101 2103 2106])
+            if ismember(subno,[2035 2057 2058 2062 2071 2083 2087 2098 2101 2103 2106 3018 4022])
                 eyeData(:,5:7)=eyeData(:,2:4);
             end
     
@@ -1871,9 +2069,9 @@ if ~isempty(gSig)
             end
              
             %interpolate blink window 
-            [value,indices] = fillmissing(eyeData(:,leftArea),'linear', 'EndValues', 'none');
+            [value,indices] = fillmissing(eyeData(:,leftArea),'linear', 'EndValues', 'nearest');
             eyeData(indices,leftArea)=value(indices);
-            [value,indices] = fillmissing(eyeData(:,rightArea),'linear', 'EndValues', 'none');
+            [value,indices] = fillmissing(eyeData(:,rightArea),'linear', 'EndValues', 'nearest');
             eyeData(indices,rightArea)=value(indices);
             
             %calculate mean pupil area
@@ -1933,6 +2131,9 @@ if ~isempty(gSig)
                 end
             end
     
+            %remove eyeTrials that you want to get rid of by making them all blinks
+            allTrialBlinks(remTrials,:)=1;
+
             %subjects 20280 and 20380 have very shortened first 2 blocks for eye data so that's why they show up a lot
             %finding bad blink trials
             if ismember(subno,[20280,20380])
@@ -2020,6 +2221,9 @@ if ~isempty(gSig)
             allData=rmfield(allData,'sumScore');
             allData=rmfield(allData,'condition');
             allData=rmfield(allData,'predRT');
+            if ismember(subno,4000:4100)
+                allData=rmfield(allData,'predStartPoint');
+            end
             %define parameters to compute learning rate
             predictions = allData.pred;
             outcomes = (allData.est);
@@ -2101,7 +2305,9 @@ if ~isempty(gSig)
                 [~,~,allData.regLRs] = regress(allData.regLRs,allData.meanSurprise);
                 [~,~,allData.indivRegLRs] = regress(allData.indivRegLRs,allData.meanSurprise);
             end
-    
+            
+            allData.goodTrials = ~rejEarlyTrials;                                                                     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+            % allData.goodTrials = max(abs(allData.subPredErr),[],2) > 60*pi/180;                                                %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             %add error vars to allData so good EEG trials can be selected
             allData.subPE = subPE;
             allData.objPE = objPE;
@@ -2109,6 +2315,9 @@ if ~isempty(gSig)
             if doEEG == 1
                 %select out trials with good EEG data for behavioral stuff
                 epoch_OBCP=epochNumbers(ind_OBCPstart:end);
+                for i = remTrials
+                    epoch_OBCP(epoch_OBCP==i) = [];
+                end
                 goodData=selBehav(allData, epoch_OBCP-nPracticeTrials);
             else
                 goodData=allData;
@@ -2120,6 +2329,9 @@ if ~isempty(gSig)
                 allRegBias(1:size(goodData.regBias,1),:,s) = goodData.regBias;
                 allIndivRegLRs(1:size(goodData.indivRegLRs,1),:,s) = goodData.indivRegLRs;
                 allIndivRegBias(1:size(goodData.indivRegBias,1),:,s) = goodData.indivRegBias;
+                allRejTrials(1:size(goodData.goodTrials,1),:,s) = goodData.goodTrials;
+                allMaxBias(1:size(goodData.bias,1),:,s) = mean(goodData.bias,2);
+                allMaxPredErr(1:size(goodData.predictErr,1),:,s) = max(goodData.predictErr,[],2);
             end
             %and eye data
             if doEye
@@ -2128,11 +2340,14 @@ if ~isempty(gSig)
                 allRegBiasAll(1:size(allData.regBias,1),:,s) = allData.regBias;
                 allIndivRegLRsAll(1:size(allData.indivRegLRs,1),:,s) = allData.indivRegLRs;
                 allIndivRegBiasAll(1:size(allData.indivRegBias,1),:,s) = allData.indivRegBias;
+                allRejTrialsAll(1:size(allData.goodTrials,1),:,s) = allData.goodTrials;
+                allMaxBiasAll(1:size(allData.bias,1),:,s) = mean(allData.bias,2);
+                allMaxPredErrAll(1:size(allData.predictErr,1),:,s) = max(allData.predictErr,[],2);
             end
     
             %regress baseline (and STP if set to) out of eye and eeg data
             if doEEG == 1
-                relDataEEG = eegDat.EEG.data(:,:,validEEG);
+                relDataEEG = eegDat.EEG.data(:,:,find(ismember(epochNumbers,epoch_OBCP)));
                 baseTimes_roi= [1800:1999]; % figure out what times are in "baseline" period
                 if trialMeasure==3 % pull out variance that can be explained by baseline before taking dot product: 
                     resDataEEG=nan(size(relDataEEG)); % preallocate space for residual data.
@@ -2182,7 +2397,7 @@ if ~isempty(gSig)
                 goodEyeData = goodEyeData.resData;
                 epochNumbersSel = epochNumbers-nPracticeTrials;
                 epochNumbersSel(epochNumbersSel<=0)=[];
-                allBadBlinksEEG(1:length(epochNumbersSel),:,sum(allDoEyeEEG))=allBadBlinksComb(epochNumbersSel,:,sum(allDoEye));
+                allBadBlinksEEG(1:length(epoch_OBCP),:,sum(allDoEyeEEG))=allBadBlinksComb(epoch_OBCP-nPracticeTrials,:,sum(allDoEye));
             end
         
             %run loop to calculate trial by trial dot product for eeg...
@@ -2245,6 +2460,15 @@ if ~isempty(gSig)
     % eeg and eye data are different lengths, so the right trials have to be removed from both for them to be combined effectively
     % this goes for trial average leaning and bias measurements as well
     
+    % CHANGE THIS BACK
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % allIndivRegBias = allMaxBias;
+    % allIndivRegBiasAll = allMaxBiasAll;
+    % allIndivRegBias = allRegBias;
+    % allIndivRegBiasAll = allRegBiasAll;
+    % CHANGE THIS BACK
+    % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     %sum/average meanTrialEffects
     sumTrialEffectEEG = sum(meanTrialEffectEEG(:,:,:),2);                                        %%%
     meanTrialEffectEEGforEye = meanTrialEffectEEG(:,:,ismember(EEGSubs,eyeSubs));                %%%
@@ -2280,6 +2504,7 @@ if ~isempty(gSig)
     allContextEEGEye = nan(nTrials,1,eegEyeNumSubs);
     allRegBiasEEGEye = nan(nTrials,1,eegEyeNumSubs);
     allRegLRsEEGEye = nan(nTrials,1,eegEyeNumSubs);
+    allRejTrialsEEGEye = nan(nTrials,1,eegEyeNumSubs);
     allSurpriseEEGEye = nan(nTrials,1,eegEyeNumSubs);
     zMeanTrialEffectEEGEye = nan(nTrials,2,eegEyeNumSubs);
     zMeanTrialEffectEEGEyeSep = nan(nTrials,size(meanTrialEffectEEGforEye,2)+size(meanTrialEffectPGoodEEG,2),eegEyeNumSubs);
@@ -2313,6 +2538,7 @@ if ~isempty(gSig)
         allContextEEGEye(1:sum(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s) = allContext(find(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s);
         allRegBiasEEGEye(1:sum(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s) = allIndivRegBias(find(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s);
         allRegLRsEEGEye(1:sum(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s) = allIndivRegLRs(find(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s);
+        allRejTrialsEEGEye(1:sum(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s) = allRejTrials(find(allBadBlinksEEG(:,:,sum(allDoEyeEEG))==0),:,s);
         end
     end
     
@@ -2399,7 +2625,7 @@ if ~isempty(gSig)
             doEyeEEG = 0;
         end
         allDoEyeEEG(s) = doEyeEEG;
-    
+
         if doEEG
             %quantiling and stuff for EEG data only
             numTrials = length(find(isfinite(sumTrialEffectEEG(:,1,sum(allDoEEG)))));
@@ -2408,9 +2634,12 @@ if ~isempty(gSig)
             condition = allData.condition(1);
         
             %calculate quantiles for sum of mean trial effects
-            borders = quantile(sumTrialEffectEEG(1:numTrials,:,sum(allDoEEG)),numQuant-1);
-            bordersCP = quantile(sumTrialEffectEEG(allContext(:,:,s)==1,:,sum(allDoEEG)),numQuant-1);
-            bordersOB = quantile(sumTrialEffectEEG(allContext(:,:,s)==-1,:,sum(allDoEEG)),numQuant-1);
+            eegTrials = allRejTrials(:,:,s)==1;
+            eegTrialsCP = allRejTrials(:,:,s)==1 & allContext(:,:,s)==1;
+            eegTrialsOB = allRejTrials(:,:,s)==1 & allContext(:,:,s)==-1;
+            borders = quantile(sumTrialEffectEEG(eegTrials,:,sum(allDoEEG)),numQuant-1);
+            bordersCP = quantile(sumTrialEffectEEG(eegTrialsCP,:,sum(allDoEEG)),numQuant-1);
+            bordersOB = quantile(sumTrialEffectEEG(eegTrialsOB,:,sum(allDoEEG)),numQuant-1);
             quantiles = zeros(numTrials,1);
         
             quantilesCP = [];
@@ -2419,13 +2648,13 @@ if ~isempty(gSig)
             %assign each trial to a quantile (1-numQuant) based on sum (lowest = 1)
             for q = numQuant:-1:1
                 if q<numQuant
-                quantilesCP(sumTrialEffectEEG(allContext(:,:,s)==1,:,sum(allDoEEG))<=bordersCP(q)) = q;
-                quantilesOB(sumTrialEffectEEG(allContext(:,:,s)==-1,:,sum(allDoEEG))<=bordersOB(q)) = q;
-                quantiles(sumTrialEffectEEG(1:numTrials,:,sum(allDoEEG))<=borders(q)) = q;
+                quantilesCP(sumTrialEffectEEG(eegTrialsCP,:,sum(allDoEEG))<=bordersCP(q)) = q;
+                quantilesOB(sumTrialEffectEEG(eegTrialsOB,:,sum(allDoEEG))<=bordersOB(q)) = q;
+                quantiles(sumTrialEffectEEG(eegTrials,:,sum(allDoEEG))<=borders(q)) = q;
                 else
-                quantilesCP(sumTrialEffectEEG(allContext(:,:,s)==1,:,sum(allDoEEG))>bordersCP(q-1)) = q;
-                quantilesOB(sumTrialEffectEEG(allContext(:,:,s)==-1,:,sum(allDoEEG))>bordersOB(q-1)) = q;
-                quantiles(sumTrialEffectEEG(1:numTrials,:,sum(allDoEEG))>borders(q-1)) = q;
+                quantilesCP(sumTrialEffectEEG(eegTrialsCP,:,sum(allDoEEG))>bordersCP(q-1)) = q;
+                quantilesOB(sumTrialEffectEEG(eegTrialsOB,:,sum(allDoEEG))>bordersOB(q-1)) = q;
+                quantiles(sumTrialEffectEEG(eegTrials,:,sum(allDoEEG))>borders(q-1)) = q;
                 end
             end
         
@@ -2446,12 +2675,16 @@ if ~isempty(gSig)
                 quantOB = quantilesOB==q;
     
                 % find LR & bias for trials within the quantile
-                quantCPLRs = meanAllLRs(quantCP,:,s);
-                quantCPBias= meanAllBias(quantCP,:,s);
-                quantCPVals= sumTrialEffectEEG(quantCP,:,sum(allDoEEG));
-                quantOBLRs = meanAllLRs(quantOB,:,s);
-                quantOBBias= meanAllBias(quantOB,:,s);
-                quantOBVals= sumTrialEffectEEG(quantOB,:,sum(allDoEEG));
+                subLRs = meanAllLRs(eegTrials,:,s);
+                subBias = meanAllBias(eegTrials,:,s);
+                subEEG = sumTrialEffectEEG(eegTrials,:,sum(allDoEEG));
+
+                quantCPLRs = subLRs(quantCP);
+                quantCPBias= subBias(quantCP);
+                quantCPVals= subEEG(quantCP);
+                quantOBLRs = subLRs(quantOB);
+                quantOBBias= subBias(quantOB);
+                quantOBVals= subEEG(quantOB);
                 
                 %take mean LR and Bias for each quantile
                 meanQuantCPLRsEEG(sum(allDoEEG),q) = nanmean(quantCPLRs);
@@ -2474,54 +2707,55 @@ if ~isempty(gSig)
             %testing hypothesis 5
                 
             %Rank order column 1 physio effect, col 2 LR, col3 bias
-            rankOrderCP = sumTrialEffectEEG(allContext(:,:,s)==1,:,sum(allDoEEG));
-            rankOrderCP(:,2) = meanAllLRs(allContext(:,:,s)==1,:,s);
-            rankOrderCP(:,3) = meanAllBias(allContext(:,:,s)==1,:,s);
+            rankOrderCP = sumTrialEffectEEG(eegTrialsCP,:,sum(allDoEEG));
+            rankOrderCP(:,2) = meanAllLRs(eegTrialsCP,:,s);
+            rankOrderCP(:,3) = meanAllBias(eegTrialsCP,:,s);
         
             %sort rank order based on physio effect
             rankOrderCPSorted = sortrows(rankOrderCP,1,"ascend");
         
             %repeat for oddball
-            rankOrderOB = sumTrialEffectEEG(allContext(:,:,s)==-1,:,sum(allDoEEG));
-            rankOrderOB(:,2) = meanAllLRs(allContext(:,:,s)==-1,:,s);
-            rankOrderOB(:,3) = meanAllBias(allContext(:,:,s)==-1,:,s);
+            rankOrderOB = sumTrialEffectEEG(eegTrialsOB,:,sum(allDoEEG));
+            rankOrderOB(:,2) = meanAllLRs(eegTrialsOB,:,s);
+            rankOrderOB(:,3) = meanAllBias(eegTrialsOB,:,s);
             rankOrderOBSorted = sortrows(rankOrderOB,1,"ascend");
         
-            xIntCP = ones(length(find(allContext(:,:,s)==1)),1);
-            xIntOB = ones(length(find(allContext(:,:,s)==-1)),1);
+            xIntCP = ones(sum(eegTrialsCP),1);
+            xIntOB = ones(sum(eegTrialsOB),1);
         
             %regress bias against each trial's physiologial effect (how much eeg cluster) rank in block 
-            LRCPslopeEEG(sum(allDoEEG),:) = regress(rankOrderCPSorted(:,2),[xIntCP,(1:length(xIntCP))']);
+            LRCPslopeEEG(sum(allDoEEG),:) =   regress(rankOrderCPSorted(:,2),[xIntCP,(1:length(xIntCP))']);
             biasCPslopeEEG(sum(allDoEEG),:) = regress(rankOrderCPSorted(:,3),[xIntCP,(1:length(xIntCP))']);
-            LROBslopeEEG(sum(allDoEEG),:) = regress(rankOrderOBSorted(:,2),[xIntOB,(1:length(xIntOB))']);
+            LROBslopeEEG(sum(allDoEEG),:) =   regress(rankOrderOBSorted(:,2),[xIntOB,(1:length(xIntOB))']);
             biasOBslopeEEG(sum(allDoEEG),:) = regress(rankOrderOBSorted(:,3),[xIntOB,(1:length(xIntOB))']);
             biasAllslopeEEG(sum(allDoEEG),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[(1:length(xIntCP))';(1:length(xIntOB))']]);
          
             %OR regress against raw signal strength rather than rank order (gives better results probably because of distribution
-            LRCPslopeEEG(sum(allDoEEG),:) = regress(rankOrderCPSorted(:,2),[xIntCP,rankOrderCPSorted(:,1)]);
+            LRCPslopeEEG(sum(allDoEEG),:) =   regress((rankOrderCPSorted(:,2)),[xIntCP,(rankOrderCPSorted(:,1))]);
             err = rankOrderCPSorted;
-            biasCPslopeEEG(sum(allDoEEG),:) = regress(rankOrderCPSorted(:,3),[xIntCP,rankOrderCPSorted(:,1)]);
-            LROBslopeEEG(sum(allDoEEG),:) = regress(rankOrderOBSorted(:,2),[xIntOB,rankOrderOBSorted(:,1)]);
-            biasOBslopeEEG(sum(allDoEEG),:) = regress(rankOrderOBSorted(:,3),[xIntOB,rankOrderOBSorted(:,1)]);
-            biasAllslopeEEG(sum(allDoEEG),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)]]);
+            biasCPslopeEEG(sum(allDoEEG),:) = regress((rankOrderCPSorted(:,3)),[xIntCP,(rankOrderCPSorted(:,1))]);
+            LROBslopeEEG(sum(allDoEEG),:) =   regress((rankOrderOBSorted(:,2)),[xIntOB,(rankOrderOBSorted(:,1))]);
+            biasOBslopeEEG(sum(allDoEEG),:) = regress((rankOrderOBSorted(:,3)),[xIntOB,(rankOrderOBSorted(:,1))]);
+            biasAllslopeEEG(sum(allDoEEG),:) = regress(([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)]),[[xIntCP;xIntOB],([rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)])]);
+
             for rr = 1:size(zMeanTrialEffectEEG,2)
                 %calculate regression results for each eeg cluster and pupil data separately
                 %Rank order column 1 physio effect, col 2 LR, col3 bias
-                rankOrderCP = zMeanTrialEffectEEG(allContext(:,:,s)==1,rr,sum(allDoEEG));
-                rankOrderCP(:,2) = meanAllLRs(allContext(:,:,s)==1,:,s);
-                rankOrderCP(:,3) = meanAllBias(allContext(:,:,s)==1,:,s);
+                rankOrderCP = zMeanTrialEffectEEG(eegTrialsCP,rr,sum(allDoEEG));
+                rankOrderCP(:,2) = meanAllLRs(eegTrialsCP,:,s);
+                rankOrderCP(:,3) = meanAllBias(eegTrialsCP,:,s);
             
                 %sort rank order based on physio effect 
                 rankOrderCPSorted = sortrows(rankOrderCP,1,"ascend");
             
                 %repeat for oddball
-                rankOrderOB = zMeanTrialEffectEEG(allContext(:,:,s)==-1,rr,sum(allDoEEG));
-                rankOrderOB(:,2) = meanAllLRs(allContext(:,:,s)==-1,:,s);
-                rankOrderOB(:,3) = meanAllBias(allContext(:,:,s)==-1,:,s);
+                rankOrderOB = zMeanTrialEffectEEG(eegTrialsOB,rr,sum(allDoEEG));
+                rankOrderOB(:,2) = meanAllLRs(eegTrialsOB,:,s);
+                rankOrderOB(:,3) = meanAllBias(eegTrialsOB,:,s);
                 rankOrderOBSorted = sortrows(rankOrderOB,1,"ascend");
             
-                xIntCP = ones(length(find(allContext(:,:,s)==1)),1);
-                xIntOB = ones(length(find(allContext(:,:,s)==-1)),1);
+                xIntCP = ones(sum(eegTrialsCP),1);
+                xIntOB = ones(sum(eegTrialsOB),1);
             
                 %regress bias against each trial's physiologial effect (how much eeg cluster) rank in block 
                 LRCPslopeEEGSep(sum(allDoEEG),:) = regress(rankOrderCPSorted(:,2),[xIntCP,(1:length(xIntCP))']);
@@ -2531,11 +2765,11 @@ if ~isempty(gSig)
                 biasAllslopeEEGSep(sum(allDoEEG),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[(1:length(xIntCP))';(1:length(xIntOB))']]);
              
                 %OR regress against raw signal strength rather than rank order (gives better results probably because of distribution
-                LRCPslopeEEGSep(sum(allDoEEG),:) = regress(rankOrderCPSorted(:,2),[xIntCP,rankOrderCPSorted(:,1)]);
-                biasCPslopeEEGSep(sum(allDoEEG),:) = regress(rankOrderCPSorted(:,3),[xIntCP,rankOrderCPSorted(:,1)]);
-                LROBslopeEEGSep(sum(allDoEEG),:) = regress(rankOrderOBSorted(:,2),[xIntOB,rankOrderOBSorted(:,1)]);
-                biasOBslopeEEGSep(sum(allDoEEG),:) = regress(rankOrderOBSorted(:,3),[xIntOB,rankOrderOBSorted(:,1)]);
-                biasAllslopeEEGSep(sum(allDoEEG),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)]]);
+                LRCPslopeEEGSep(sum(allDoEEG),:) =   regress((rankOrderCPSorted(:,2)),[xIntCP,(rankOrderCPSorted(:,1))]);
+                biasCPslopeEEGSep(sum(allDoEEG),:) = regress((rankOrderCPSorted(:,3)),[xIntCP,(rankOrderCPSorted(:,1))]);
+                LROBslopeEEGSep(sum(allDoEEG),:) =   regress((rankOrderOBSorted(:,2)),[xIntOB,(rankOrderOBSorted(:,1))]);
+                biasOBslopeEEGSep(sum(allDoEEG),:) = regress((rankOrderOBSorted(:,3)),[xIntOB,(rankOrderOBSorted(:,1))]);
+                biasAllslopeEEGSep(sum(allDoEEG),:) = regress(([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)]),[[xIntCP;xIntOB],([rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)])]);
                 
                 varSlopes(rr,:,sum(allDoEEG)) = [biasCPslopeEEGSep(sum(allDoEEG),2),biasOBslopeEEGSep(sum(allDoEEG),2),biasCPslopeEEGSep(sum(allDoEEG),2)+biasOBslopeEEGSep(sum(allDoEEG),2),LRCPslopeEEGSep(sum(allDoEEG),2),LROBslopeEEGSep(sum(allDoEEG),2),LRCPslopeEEGSep(sum(allDoEEG),2)-LROBslopeEEGSep(sum(allDoEEG),2)];
                 biasAllSlopes(rr,:,sum(allDoEEG)) = biasCPslopeEEGSep(sum(allDoEEG),2)+biasOBslopeEEGSep(sum(allDoEEG),2);
@@ -2546,32 +2780,37 @@ if ~isempty(gSig)
                 LROBAllSlopes(rr,:,sum(allDoEEG)) = LROBslopeEEGSep(sum(allDoEEG),2);
             end
         end
+       
         if doEye
             %quantiling and stuff for eye data only
             numTrials = nTrials;
             allData=load(fullfile([behaveDir,'subCombined/', subNum, '_3and4BlockData.mat']));
             allData = allData.alldata;
             condition = allData.condition(1);
+
+            eyeTrials = allRejTrialsAll(:,:,s)==1 & ~allBadBlinks(:,:,sum(allDoEye));
+            eyeTrialsCP = eyeTrials & allContextAll(:,:,s)==1;
+            eyeTrialsOB = eyeTrials & allContextAll(:,:,s)==-1;
         
             %calculate quantiles for sum of mean trial effects
-            borders = quantile(sumTrialEffectEye(1:numTrials,:,sum(allDoEye)),numQuant-1);
-            bordersCP = quantile(sumTrialEffectEye(allContextAll(:,:,s)==1,:,sum(allDoEye)),numQuant-1);
-            bordersOB = quantile(sumTrialEffectEye(allContextAll(:,:,s)==-1,:,sum(allDoEye)),numQuant-1);
-            quantiles = zeros(numTrials,1);
+            borders = quantile(sumTrialEffectEye(eyeTrials,:,sum(allDoEye)),numQuant-1);
+            bordersCP = quantile(sumTrialEffectEye(eyeTrialsCP,:,sum(allDoEye)),numQuant-1);
+            bordersOB = quantile(sumTrialEffectEye(eyeTrialsOB,:,sum(allDoEye)),numQuant-1);
+            quantiles = zeros(sum(eyeTrials),1);
     
-            quantilesCP = zeros(numTrials/2,1);
-            quantilesOB = zeros(numTrials/2,1);
+            quantilesCP = zeros(sum(eyeTrialsCP),1);
+            quantilesOB = zeros(sum(eyeTrialsOB),1);
         
             %assign each trial to a quantile (1-numQuant) based on sum (lowest = 1)
             for q = numQuant:-1:1
                 if q<numQuant
-                quantilesCP(sumTrialEffectEye(allContextAll(:,:,s)==1,:,sum(allDoEye))<=bordersCP(q)) = q;
-                quantilesOB(sumTrialEffectEye(allContextAll(:,:,s)==-1,:,sum(allDoEye))<=bordersOB(q)) = q;
-                quantiles(sumTrialEffectEye(1:numTrials,:,sum(allDoEye))<=borders(q)) = q;
+                quantilesCP(sumTrialEffectEye(eyeTrialsCP,:,sum(allDoEye))<=bordersCP(q)) = q;
+                quantilesOB(sumTrialEffectEye(eyeTrialsOB,:,sum(allDoEye))<=bordersOB(q)) = q;
+                quantiles(sumTrialEffectEye(eyeTrials,:,sum(allDoEye))<=borders(q)) = q;
                 else
-                quantilesCP(sumTrialEffectEye(allContextAll(:,:,s)==1,:,sum(allDoEye))>bordersCP(q-1)) = q;
-                quantilesOB(sumTrialEffectEye(allContextAll(:,:,s)==-1,:,sum(allDoEye))>bordersOB(q-1)) = q;
-                quantiles(sumTrialEffectEye(1:numTrials,:,sum(allDoEye))>borders(q-1)) = q;
+                quantilesCP(sumTrialEffectEye(eyeTrialsCP,:,sum(allDoEye))>bordersCP(q-1)) = q;
+                quantilesOB(sumTrialEffectEye(eyeTrialsOB,:,sum(allDoEye))>bordersOB(q-1)) = q;
+                quantiles(sumTrialEffectEye(eyeTrials,:,sum(allDoEye))>borders(q-1)) = q;
                 end
             end
         
@@ -2592,12 +2831,23 @@ if ~isempty(gSig)
                 quantCP = quantilesCP==q;
                 quantOB = quantilesOB==q;
                 % find LR & bias for trials within the quantile
-                quantCPLRs = meanAllLRsEye(quantCP,:,s);
-                quantCPBias= meanAllBiasEye(quantCP,:,s);
-                quantCPVals= sumTrialEffectEye(quantCP,:,sum(allDoEye));
-                quantOBLRs = meanAllLRsEye(quantOB,:,s);
-                quantOBBias= meanAllBiasEye(quantOB,:,s);
-                quantOBVals= sumTrialEffectEye(quantOB,:,sum(allDoEye));
+                subLRs = meanAllLRsEye(eyeTrials,:,s);
+                subBias = meanAllBiasEye(eyeTrials,:,s);
+                subEye = sumTrialEffectEye(eyeTrials,:,sum(allDoEye));
+
+                quantCPLRs = subLRs(quantCP);
+                quantCPBias= subBias(quantCP);
+                quantCPVals= subEye(quantCP);
+                quantOBLRs = subLRs(quantOB);
+                quantOBBias= subBias(quantOB);
+                quantOBVals= subEye(quantOB);
+
+                % quantCPLRs = meanAllLRsEye(quantCP,:,s);
+                % quantCPBias= meanAllBiasEye(quantCP,:,s);
+                % quantCPVals= sumTrialEffectEye(quantCP,:,sum(allDoEye));
+                % quantOBLRs = meanAllLRsEye(quantOB,:,s);
+                % quantOBBias= meanAllBiasEye(quantOB,:,s);
+                % quantOBVals= sumTrialEffectEye(quantOB,:,sum(allDoEye));
                 
                 %take mean LR and Bias for each quantile
                 meanQuantCPLRsEye(sum(allDoEye),q) = nanmean(quantCPLRs);
@@ -2620,21 +2870,21 @@ if ~isempty(gSig)
     
             %testing hypothesis 5
             %Rank order column 1 physio effect, col 2 LR, col3 bias
-            rankOrderCP = sumTrialEffectEye(allContextAll(:,:,s)==1,:,sum(allDoEye));
-            rankOrderCP(:,2) = meanAllLRsEye(allContextAll(:,:,s)==1,:,s);
-            rankOrderCP(:,3) = meanAllBiasEye(allContextAll(:,:,s)==1,:,s);
+            rankOrderCP = sumTrialEffectEye(eyeTrialsCP,:,sum(allDoEye));
+            rankOrderCP(:,2) = meanAllLRsEye(eyeTrialsCP,:,s);
+            rankOrderCP(:,3) = meanAllBiasEye(eyeTrialsCP,:,s);
         
             %sort rank order based on physio effect
             rankOrderCPSorted = sortrows(rankOrderCP,1,"ascend");
         
             %repeat for oddball
-            rankOrderOB = sumTrialEffectEye(allContextAll(:,:,s)==-1,:,sum(allDoEye));
-            rankOrderOB(:,2) = meanAllLRsEye(allContextAll(:,:,s)==-1,:,s);
-            rankOrderOB(:,3) = meanAllBiasEye(allContextAll(:,:,s)==-1,:,s);
+            rankOrderOB = sumTrialEffectEye(eyeTrialsOB,:,sum(allDoEye));
+            rankOrderOB(:,2) = meanAllLRsEye(eyeTrialsOB,:,s);
+            rankOrderOB(:,3) = meanAllBiasEye(eyeTrialsOB,:,s);
             rankOrderOBSorted = sortrows(rankOrderOB,1,"ascend");
         
-            xIntCP = ones(length(find(allContextAll(:,:,s)==1)),1);
-            xIntOB = ones(length(find(allContextAll(:,:,s)==-1)),1);
+            xIntCP = ones(sum(eyeTrialsCP),1);
+            xIntOB = ones(sum(eyeTrialsOB),1);
         
             %regress bias against each trial's physiologial effect (how much eeg cluster) rank in block 
             LRCPslopeEye(sum(allDoEye),:) = regress(rankOrderCPSorted(:,2),[xIntCP,(1:length(xIntCP))']);
@@ -2644,23 +2894,28 @@ if ~isempty(gSig)
             biasAllslopeEye(sum(allDoEye),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[(1:length(xIntCP))';(1:length(xIntOB))']]);
          
             %OR regress against raw signal strength rather than rank order (gives better results probably because of distribution
-            LRCPslopeEye(sum(allDoEye),:) = regress(rankOrderCPSorted(:,2),[xIntCP,rankOrderCPSorted(:,1)]);
-            biasCPslopeEye(sum(allDoEye),:) = regress(rankOrderCPSorted(:,3),[xIntCP,rankOrderCPSorted(:,1)]);
-            LROBslopeEye(sum(allDoEye),:) = regress(rankOrderOBSorted(:,2),[xIntOB,rankOrderOBSorted(:,1)]);
-            biasOBslopeEye(sum(allDoEye),:) = regress(rankOrderOBSorted(:,3),[xIntOB,rankOrderOBSorted(:,1)]);
-            biasAllslopeEye(sum(allDoEye),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)]]);
+            LRCPslopeEye(sum(allDoEye),:) =   regress((rankOrderCPSorted(:,2)),[xIntCP,(rankOrderCPSorted(:,1))]);
+            biasCPslopeEye(sum(allDoEye),:) = regress((rankOrderCPSorted(:,3)),[xIntCP,(rankOrderCPSorted(:,1))]);
+            LROBslopeEye(sum(allDoEye),:) =   regress((rankOrderOBSorted(:,2)),[xIntOB,(rankOrderOBSorted(:,1))]);
+            biasOBslopeEye(sum(allDoEye),:) = regress((rankOrderOBSorted(:,3)),[xIntOB,zscore(rankOrderOBSorted(:,1))]);
+            biasAllslopeEye(sum(allDoEye),:) = regress(([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)]),[[xIntCP;xIntOB],([rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)])]);
         end
+        
         if doEyeEEG
             %quantiling and stuff for eeg + eye data where eeg clusters have been summed and equally weighted with pupil 
             numTrials = length(find(isfinite(sumTrialEffectEEGEye(:,1,sum(allDoEyeEEG)))));
             allData=load(fullfile([behaveDir,'subCombined/', subNum, '_3and4BlockData.mat']));
             allData = allData.alldata;
             condition = allData.condition(1);
+
+            eegEyeTrials = allRejTrialsEEGEye(:,:,s)==1;
+            eegEyeTrialsCP = allRejTrialsEEGEye(:,:,s)==1 & allContextEEGEye(:,:,s)==1;
+            eegEyeTrialsOB = allRejTrialsEEGEye(:,:,s)==1 & allContextEEGEye(:,:,s)==-1;
         
             %calculate quantiles for sum of mean trial effects
-            borders = quantile(sumTrialEffectEEGEye(1:numTrials,:,sum(allDoEyeEEG)),numQuant-1);
-            bordersCP = quantile(sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==1,:,sum(allDoEyeEEG)),numQuant-1);
-            bordersOB = quantile(sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==-1,:,sum(allDoEyeEEG)),numQuant-1);
+            borders = quantile(sumTrialEffectEEGEye(eegEyeTrials,:,sum(allDoEyeEEG)),numQuant-1);
+            bordersCP = quantile(sumTrialEffectEEGEye(eegEyeTrialsCP,:,sum(allDoEyeEEG)),numQuant-1);
+            bordersOB = quantile(sumTrialEffectEEGEye(eegEyeTrialsOB,:,sum(allDoEyeEEG)),numQuant-1);
             quantiles = zeros(numTrials,1);
         
             quantilesCP = [];
@@ -2669,13 +2924,13 @@ if ~isempty(gSig)
             %assign each trial to a quantile (1-numQuant) based on sum (lowest = 1)
             for q = numQuant:-1:1
                 if q<numQuant
-                quantilesCP(sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==1,:,sum(allDoEyeEEG))<=bordersCP(q)) = q;
-                quantilesOB(sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==-1,:,sum(allDoEyeEEG))<=bordersOB(q)) = q;
-                quantiles(sumTrialEffectEEGEye(1:numTrials,:,sum(allDoEyeEEG))<=borders(q)) = q;
+                quantilesCP(sumTrialEffectEEGEye(eegEyeTrialsCP,:,sum(allDoEyeEEG))<=bordersCP(q)) = q;
+                quantilesOB(sumTrialEffectEEGEye(eegEyeTrialsOB,:,sum(allDoEyeEEG))<=bordersOB(q)) = q;
+                quantiles(sumTrialEffectEEGEye(eegEyeTrials,:,sum(allDoEyeEEG))<=borders(q)) = q;
                 else
-                quantilesCP(sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==1,:,sum(allDoEyeEEG))>bordersCP(q-1)) = q;
-                quantilesOB(sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==-1,:,sum(allDoEyeEEG))>bordersOB(q-1)) = q;
-                quantiles(sumTrialEffectEEGEye(1:numTrials,:,sum(allDoEyeEEG))>borders(q-1)) = q;
+                quantilesCP(sumTrialEffectEEGEye(eegEyeTrialsCP,:,sum(allDoEyeEEG))>bordersCP(q-1)) = q;
+                quantilesOB(sumTrialEffectEEGEye(eegEyeTrialsOB,:,sum(allDoEyeEEG))>bordersOB(q-1)) = q;
+                quantiles(sumTrialEffectEEGEye(eegEyeTrials,:,sum(allDoEyeEEG))>borders(q-1)) = q;
                 end
             end
         
@@ -2696,12 +2951,23 @@ if ~isempty(gSig)
                 quantOB = quantilesOB==q;
     
                 % find LR & bias for trials within the quantile
-                quantCPLRs = meanAllLRsEEGEye(quantCP,:,s);
-                quantCPBias= meanAllBiasEEGEye(quantCP,:,s);
-                quantCPVals= sumTrialEffectEEGEye(quantCP,:,sum(allDoEyeEEG));
-                quantOBLRs = meanAllLRsEEGEye(quantOB,:,s);
-                quantOBBias= meanAllBiasEEGEye(quantOB,:,s);
-                quantOBVals= sumTrialEffectEEGEye(quantOB,:,sum(allDoEyeEEG));
+                subLRs = meanAllLRsEEGEye(eegEyeTrials,:,s);
+                subBias = meanAllBiasEEGEye(eegEyeTrials,:,s);
+                subEEG = sumTrialEffectEEGEye(eegEyeTrials,:,sum(allDoEyeEEG));
+
+                quantCPLRs = subLRs(quantCP);
+                quantCPBias= subBias(quantCP);
+                quantCPVals= subEEG(quantCP);
+                quantOBLRs = subLRs(quantOB);
+                quantOBBias= subBias(quantOB);
+                quantOBVals= subEEG(quantOB);
+
+                % quantCPLRs = meanAllLRsEEGEye(quantCP,:,s);
+                % quantCPBias= meanAllBiasEEGEye(quantCP,:,s);
+                % quantCPVals= sumTrialEffectEEGEye(quantCP,:,sum(allDoEyeEEG));
+                % quantOBLRs = meanAllLRsEEGEye(quantOB,:,s);
+                % quantOBBias= meanAllBiasEEGEye(quantOB,:,s);
+                % quantOBVals= sumTrialEffectEEGEye(quantOB,:,sum(allDoEyeEEG));
                 
                 %take mean LR and Bias for each quantile
                 meanQuantCPLRsEEGEye(sum(allDoEyeEEG),q) = nanmean(quantCPLRs);
@@ -2724,21 +2990,21 @@ if ~isempty(gSig)
             %testing hypothesis 5
                 
             %Rank order column 1 physio effect, col 2 LR, col3 bias
-            rankOrderCP = sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==1,:,sum(allDoEyeEEG));
-            rankOrderCP(:,2) = meanAllLRsEEGEye(allContextEEGEye(:,:,s)==1,:,s);
-            rankOrderCP(:,3) = meanAllBiasEEGEye(allContextEEGEye(:,:,s)==1,:,s);
+            rankOrderCP = sumTrialEffectEEGEye(eegEyeTrialsCP,:,sum(allDoEyeEEG));
+            rankOrderCP(:,2) = meanAllLRsEEGEye(eegEyeTrialsCP,:,s);
+            rankOrderCP(:,3) = meanAllBiasEEGEye(eegEyeTrialsCP,:,s);
         
             %sort rank order based on physio effect
             rankOrderCPSorted = sortrows(rankOrderCP,1,"ascend");
         
             %repeat for oddball
-            rankOrderOB = sumTrialEffectEEGEye(allContextEEGEye(:,:,s)==-1,:,sum(allDoEyeEEG));
-            rankOrderOB(:,2) = meanAllLRsEEGEye(allContextEEGEye(:,:,s)==-1,:,s);
-            rankOrderOB(:,3) = meanAllBiasEEGEye(allContextEEGEye(:,:,s)==-1,:,s);
+            rankOrderOB = sumTrialEffectEEGEye(eegEyeTrialsOB,:,sum(allDoEyeEEG));
+            rankOrderOB(:,2) = meanAllLRsEEGEye(eegEyeTrialsOB,:,s);
+            rankOrderOB(:,3) = meanAllBiasEEGEye(eegEyeTrialsOB,:,s);
             rankOrderOBSorted = sortrows(rankOrderOB,1,"ascend");
         
-            xIntCP = ones(length(find(allContextEEGEye(:,:,s)==1)),1);
-            xIntOB = ones(length(find(allContextEEGEye(:,:,s)==-1)),1);
+            xIntCP = ones(sum(eegEyeTrialsCP),1);
+            xIntOB = ones(sum(eegEyeTrialsOB),1);
         
             %regress bias against each trial's physiologial effect (how much eeg cluster) rank in block 
             LRCPslopeEEGEye(sum(allDoEyeEEG),:) = regress(rankOrderCPSorted(:,2),[xIntCP,(1:length(xIntCP))']);
@@ -2748,11 +3014,12 @@ if ~isempty(gSig)
             biasAllslopeEEGEye(sum(allDoEyeEEG),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[(1:length(xIntCP))';(1:length(xIntOB))']]);
          
             %OR regress against raw signal strength rather than rank order (gives better results probably because of distribution
-            LRCPslopeEEGEye(sum(allDoEyeEEG),:) = regress(rankOrderCPSorted(:,2),[xIntCP,rankOrderCPSorted(:,1)]);
-            biasCPslopeEEGEye(sum(allDoEyeEEG),:) = regress(rankOrderCPSorted(:,3),[xIntCP,rankOrderCPSorted(:,1)]);
-            LROBslopeEEGEye(sum(allDoEyeEEG),:) = regress(rankOrderOBSorted(:,2),[xIntOB,rankOrderOBSorted(:,1)]);
-            biasOBslopeEEGEye(sum(allDoEyeEEG),:) = regress(rankOrderOBSorted(:,3),[xIntOB,rankOrderOBSorted(:,1)]);
-            biasAllslopeEEGEye(sum(allDoEyeEEG),:) = regress([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)],[[xIntCP;xIntOB],[rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)]]);
+            LRCPslopeEEGEye(sum(allDoEyeEEG),:) =   regress((rankOrderCPSorted(:,2)),[xIntCP,(rankOrderCPSorted(:,1))]);
+            biasCPslopeEEGEye(sum(allDoEyeEEG),:) = regress((rankOrderCPSorted(:,3)),[xIntCP,(rankOrderCPSorted(:,1))]);
+            LROBslopeEEGEye(sum(allDoEyeEEG),:) =   regress((rankOrderOBSorted(:,2)),[xIntOB,(rankOrderOBSorted(:,1))]);
+            biasOBslopeEEGEye(sum(allDoEyeEEG),:) = regress((rankOrderOBSorted(:,3)),[xIntOB,(rankOrderOBSorted(:,1))]);
+            biasAllslopeEEGEye(sum(allDoEyeEEG),:) = regress(([rankOrderCPSorted(:,3);rankOrderOBSorted(:,3)]),[[xIntCP;xIntOB],([rankOrderCPSorted(:,1);rankOrderOBSorted(:,1)])]);
+            disp(s)
         end
     end
     
@@ -2836,44 +3103,44 @@ if ~isempty(gSig)
     allCorrsSig0001 = [[ttest(eegCorrs,0,'dim',3,'alpha',0.0001);ttest(eegEyeCorrs(end,1:end-1,:),0,'dim',3,'alpha',0.0001)],ttest(eegEyeCorrs(:,end,:),0,'dim',3,'alpha',0.0001)];
     
     %image plot for correlation between eeg clusters and pupil dilation
-    % figure
-    % imagesc(allMeanCorrs)
-    % yticks(1:length(allMeanCorrs))
-    % yticklabels([clusterLabels])
-    % xticks(1:length(allMeanCorrs))
-    % xticklabels([clusterLabels])
-    % 
-    % colorbar
-    % colormap parula
-    % caxis([-1,1]);
-    % [R, C] = ndgrid(1:size(allMeanCorrs,1), 1:size(allMeanCorrs,1));
-    % R = R(:); C = C(:) - 1/10;
-    % 
-    % clear mask
-    % vals = round(allMeanCorrs,2);
-    % mask = vals <= 0;
-    % text(C(mask), R(mask), string(vals(mask)), 'color', 'w',"FontName","Arial","FontWeight","bold","FontSize",14)
-    % text(C(~mask), R(~mask), string(vals(~mask)), 'color', 'k',"FontName","Arial","FontWeight","bold","FontSize",14)
-    %         set(gca, 'box', 'off')
-    %         set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
-    % 
-    % if doSTPResiduals == 0
-    %     fig = gcf;
-    %     figName = append("Figure_S4_",figTime,'.eps');
-    %     figLoc = append(figDir,figName);
-    %     exportgraphics(fig,figLoc,'BackgroundColor','none','ContentType','vector')
-    %     figName = append("Figure_S4_",figTime,'.png');
-    %     figLoc = append(figDir,figName);
-    %     saveas(fig,figLoc)
-    % else
-    %     fig = gcf;
-    %     figName = append("Figure_S4_Residual_",figTime,'.eps');
-    %     figLoc = append(figDir,figName);
-    %     exportgraphics(fig,figLoc,'BackgroundColor','none','ContentType','vector')
-    %     figName = append("Figure_S4_Residual",figTime,'.png');
-    %     figLoc = append(figDir,figName);
-    %     saveas(fig,figLoc)
-    % end
+    figure
+    imagesc(allMeanCorrs)
+    yticks(1:length(allMeanCorrs))
+    yticklabels([clusterLabels])
+    xticks(1:length(allMeanCorrs))
+    xticklabels([clusterLabels])
+
+    colorbar
+    colormap parula
+    caxis([-1,1]);
+    [R, C] = ndgrid(1:size(allMeanCorrs,1), 1:size(allMeanCorrs,1));
+    R = R(:); C = C(:) - 1/10;
+
+    clear mask
+    vals = round(allMeanCorrs,2);
+    mask = vals <= 0;
+    text(C(mask), R(mask), string(vals(mask)), 'color', 'w',"FontName","Arial","FontWeight","bold","FontSize",14)
+    text(C(~mask), R(~mask), string(vals(~mask)), 'color', 'k',"FontName","Arial","FontWeight","bold","FontSize",14)
+            set(gca, 'box', 'off')
+            set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+
+    if doSTPResiduals == 0
+        fig = gcf;
+        figName = append("Figure_S4_",figTime,'.eps');
+        figLoc = append(figDir,figName);
+        exportgraphics(fig,figLoc,'BackgroundColor','none','ContentType','vector')
+        figName = append("Figure_S4_",figTime,'.png');
+        figLoc = append(figDir,figName);
+        saveas(fig,figLoc)
+    else
+        fig = gcf;
+        figName = append("Figure_S4_Residual_",figTime,'.eps');
+        figLoc = append(figDir,figName);
+        exportgraphics(fig,figLoc,'BackgroundColor','none','ContentType','vector')
+        figName = append("Figure_S4_Residual",figTime,'.png');
+        figLoc = append(figDir,figName);
+        saveas(fig,figLoc)
+    end
     % figure
     % imagesc(allMeanCorrs)
     % yticks(1:length(allMeanCorrs))
@@ -2981,8 +3248,8 @@ if ~isempty(gSig)
             set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
             yline(0)
             xline(0)
-            xticks(0)
-            yticks(0)
+            yticks([-0.05,0,0.05])
+            xticks([-0.05,0,0.05])
             maxBias = max([biasOBslopeEEGEye(:,2);biasCPslopeEEGEye(:,2)])*1.05;
             ylim([-maxBias,maxBias])
             xlim([-maxBias,maxBias])
@@ -2998,8 +3265,8 @@ if ~isempty(gSig)
             set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
             yline(0)
             xline(0)
-            xticks(0)
-            yticks(0)
+            yticks([-0.05,0,0.05])
+            xticks([-0.05,0,0.05])
             maxLR = max([LROBslopeEEGEye(:,2);LRCPslopeEEGEye(:,2)])*1.05;
             ylim([-maxLR,maxLR])
             xlim([-maxLR,maxLR])
@@ -3021,8 +3288,8 @@ if ~isempty(gSig)
             xlim([-axLim,axLim])
             xline(0)
             yline(0)
-            yticks(0)
-            xticks(0)
+            yticks([-0.05,0,0.05])
+            xticks([-0.05,0,0.05])
             xlabel("Bias vs Arousal Slope")
             ylabel("Learning vs Arousal Slope")
             legend('Changepoint','Oddball')
@@ -3040,7 +3307,7 @@ if ~isempty(gSig)
             errorbar(slopeBs(1:4),slopeBsInt(1:4,2)-slopeBs(1:4),'.','Color','k');
             xticklabels(["Intercept","Bias Slope","Cond","Bias Slope*Cond"])
             ylabel("Regression Coefficient")
-            yticks(0)
+            yticks([-0.01,0,0.01])
             set(gca, 'box', 'off')
             set(gca,"FontName","Arial","FontWeight","bold","FontSize",12)
     
@@ -3081,8 +3348,8 @@ if ~isempty(gSig)
         xlim([-axLim,axLim])
         xline(0)
         yline(0)
-        yticks(0)
-        xticks(0)
+        yticks([-0.1,0,0.1])
+        xticks([-0.1,0,0.1])
         xlabel("Bias vs Arousal Slope")
         ylabel("Learning vs Arousal Slope")
         legend('Changepoint','Oddball')
@@ -3112,7 +3379,7 @@ if ~isempty(gSig)
             errorbar(slopeBs(1:4),slopeBsInt(1:4,2)-slopeBs(1:4),'.','Color','k');
             xticklabels(["Intercept","Bias Slope","Condition","Bias Slope*Condition"])
             ylabel("Regression Coefficient")
-            yticks(0)
+            yticks([-0.02,0,0.02])
             set(gca, 'box', 'off')
             set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
     
@@ -3169,10 +3436,10 @@ subplot(7,14,panel1)
 
 subplot(7,14,panel2)
 %raw estimation error quantiled for good subjects
-    scatter(quantileAllCPxesBias,meanQuantilesCPAllErrBias,30,'o',"MarkerEdgeColor",cpColor,"MarkerFaceColor",cpLColor)
+    scatter(quantileGoodCPxesBias,meanQuantilesCPGoodErrBias,30,'o',"MarkerEdgeColor",cpColor,"MarkerFaceColor",cpLColor)
     hold on
     plot([-3,3],[-3,3],'--','Color',[0.5,0.5,0.5])
-    scatter(quantileAllOBxesBias,meanQuantilesOBAllErrBias,30,'o',"MarkerEdgeColor",obColor,"MarkerFaceColor",obLColor)
+    scatter(quantileGoodOBxesBias,meanQuantilesOBGoodErrBias,30,'o',"MarkerEdgeColor",obColor,"MarkerFaceColor",obLColor)
     hold off
     ylabel("Perceptual Error")
     xlabel("Objective Prediction Error")
@@ -3229,7 +3496,7 @@ subplot(7,14,panel3)
     xtickangle(45)
     yline(0);
     xlim([min(cAll)-0.5 c+1])
-    yticks(0)
+    yticks([-10:5:10])
     %ylim([-4 4])
     hold off
     set(gca, 'box', 'off')
@@ -3317,7 +3584,7 @@ if ~isempty(gSig)
         xticklabels(clusterLabels)
         %FIX XTICK LABELS
         ylabel("Average Bias Slope")
-        yticks(0)
+        yticks([-0.05,0])
         set(gca, 'box', 'off')
         set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)
 end
@@ -3342,7 +3609,13 @@ else
 end
 
 %%
+
 % Learning Rate Figure
+if ismember(subno,4001:4099)
+    lLims = [0.55,0.75];
+else
+    lLims = [0.45,0.67];
+end
 figure("Position",[100,100,1600,850])
 set(gcf,'renderer','Painters')
 subplot(7,14,panel1)
@@ -3415,7 +3688,7 @@ subplot(7,14,panel3)
     yline(0);
     %ylim([-4,8])
     xlim([min(cAll)-0.5 c+1])
-    yticks(0)
+    yticks(-2:2:6)
     %ylim([-4.5 4.5])
     hold off
     set(gca, 'box', 'off')
@@ -3430,8 +3703,8 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBLRsEEG(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim([0.45,0.67]);
-        yticks([0.45,0.67]) 
+        ylim(lLims);
+        yticks(lLims) 
         xticks(1:numQuant)
         xlabel("EEG Quantile")
         ylabel("Mean LR")
@@ -3444,7 +3717,7 @@ if ~isempty(gSig)
         plot(x,yOBLR,'Color',obColor)
         set(gca, 'box', 'off')
         set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)
-    
+
     subplot(7,14,panel5)
     %pupil learning quantiles
         semCP = std(meanQuantCPLRsEye(:,:))/sqrt(length(eyeSubs));
@@ -3453,8 +3726,8 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBLRsEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim([0.45,0.67]);
-        yticks([0.45,0.67]) 
+        ylim(lLims);
+        yticks(lLims) 
         xticks(1:numQuant)
         xlabel("Pupil Quantile")
         ylabel("Mean LR")
@@ -3467,7 +3740,7 @@ if ~isempty(gSig)
         plot(x,yOBLR,'Color',obColor)
         set(gca, 'box', 'off')
         set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)
-    
+
     subplot(7,14,panel6)
     %eeg+pupil learning quantiles
         semCP = std(meanQuantCPLRsEEGEye(:,:))/sqrt(eegEyeNumSubs);
@@ -3476,8 +3749,8 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBLRsEEGEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim([0.45,0.67]);
-        yticks([0.45,0.67]) 
+        ylim(lLims);
+        yticks(lLims) 
         xticks(1:numQuant)
         xlabel("EEG + Pupil Quantile")
         ylabel("Mean LR")
@@ -3488,10 +3761,10 @@ if ~isempty(gSig)
         yOBLR = polyval(fitOBLR , x);
         plot(x,yCPLR,'Color',cpColor)
         plot(x,yOBLR,'Color',obColor)
-        legend("","","Changepoint","Oddball","Location","east")
+        legend("","","Changepoint","Oddball","Location","northwest")
         set(gca, 'box', 'off')
         set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)
-    
+
     subplot(7,14,panel7)
     %separate clusters learning slopes
     bar([mean(varSlopes(:,6,:),3);mean(LRCPslopeEye(:,2)'-LROBslopeEye(:,2)')])
@@ -3503,7 +3776,7 @@ if ~isempty(gSig)
         xticklabels(clusterLabels)
         %FIX XTICK LABELS
         ylabel("Average LR Slope")
-        yticks(0)
+        yticks([0,0.04])
         set(gca, 'box', 'off')
         set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)        
 end
@@ -3526,3 +3799,368 @@ else
     figLoc = append(figDir,figName);
     saveas(fig,figLoc)
 end
+
+
+ %%
+%categorize good vs bad subject indices
+if realData == 1
+    badSubs = behaveSubs(paramsCircUpdateAll(:,4)<0.03);
+    badSubsIdx = ismember(behaveSubs,badSubs);
+    badEEGSubs = intersect(badSubs,EEGSubs,'stable');
+    badEEGSubsIdx = ismember(EEGSubs,badEEGSubs);
+    badEyeSubs = intersect(badSubs,eyeSubs,'stable');
+    badEyeSubsIdx = ismember(eyeSubs,badEyeSubs);
+    EEGEyeSubs = intersect(EEGSubs,eyeSubs,'stable');
+    badEEGEyeSubs = intersect(EEGEyeSubs,badSubs);
+    badEEGEyeSubsIdx = ismember(EEGEyeSubs,badEEGEyeSubs);
+    goodSubsIdx = ~badSubsIdx;
+    goodEEGSubsIdx = ~badEEGSubsIdx;
+    goodEyeSubsIdx = ~badEyeSubsIdx;
+    goodEEGEyeSubsIdx = ~badEEGEyeSubsIdx;
+    lLims = [0.42,0.70];
+    figure("Position",[100,100,1200,750])
+        subplot(2,3,1)
+        %eeg learning quantiles
+            semCP = std(meanQuantCPLRsEEG(goodEEGSubsIdx,:))/sqrt(sum(goodEEGSubsIdx));
+            semOB = std(meanQuantOBLRsEEG(goodEEGSubsIdx,:))/sqrt(sum(goodEEGSubsIdx));
+            errorbar(mean(meanQuantCPLRsEEG(goodEEGSubsIdx,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+            hold on
+            errorbar(mean(meanQuantOBLRsEEG(goodEEGSubsIdx,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+            xlim([0,numQuant+1])
+            ylim(lLims);
+            yticks(lLims) 
+            xticks(1:numQuant)
+            xlabel("EEG Quantile")
+            ylabel("Good Subs Mean LR")
+            fitCPLR = polyfit(1:numQuant,mean(meanQuantCPLRsEEG(goodEEGSubsIdx,:)), 1);
+            fitOBLR = polyfit(1:numQuant,mean(meanQuantOBLRsEEG(goodEEGSubsIdx,:)), 1);
+            x = 1:numQuant;
+            yCPLR = polyval(fitCPLR , x);
+            yOBLR = polyval(fitOBLR , x);
+            plot(x,yCPLR,'Color',cpColor)
+            plot(x,yOBLR,'Color',obColor)
+            set(gca, 'box', 'off')
+            set(gca,"FontName","Arial","FontWeight","bold","FontSize",15)
+    
+        subplot(2,3,2)
+        %pupil learning quantiles
+            semCP = std(meanQuantCPLRsEye(goodEyeSubsIdx,:))/sqrt(sum(goodEyeSubsIdx));
+            semOB = std(meanQuantOBLRsEye(goodEyeSubsIdx,:))/sqrt(sum(goodEyeSubsIdx));
+            errorbar(mean(meanQuantCPLRsEye(goodEyeSubsIdx,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+            hold on
+            errorbar(mean(meanQuantOBLRsEye(goodEyeSubsIdx,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+            xlim([0,numQuant+1])
+            ylim(lLims);
+            yticks(lLims) 
+            xticks(1:numQuant)
+            xlabel("Pupil Quantile")
+            ylabel("Good Subs Mean LR")
+            fitCPLR = polyfit(1:numQuant,mean(meanQuantCPLRsEye(goodEyeSubsIdx,:)), 1);
+            fitOBLR = polyfit(1:numQuant,mean(meanQuantOBLRsEye(goodEyeSubsIdx,:)), 1);
+            x = 1:numQuant;
+            yCPLR = polyval(fitCPLR , x);
+            yOBLR = polyval(fitOBLR , x);
+            plot(x,yCPLR,'Color',cpColor)
+            plot(x,yOBLR,'Color',obColor)
+            set(gca, 'box', 'off')
+            set(gca,"FontName","Arial","FontWeight","bold","FontSize",15)
+    
+        subplot(2,3,3)
+        %eeg+pupil learning quantiles
+            semCP = std(meanQuantCPLRsEEGEye(goodEEGEyeSubsIdx,:))/sqrt(sum(goodEEGEyeSubsIdx));
+            semOB = std(meanQuantOBLRsEEGEye(goodEEGEyeSubsIdx,:))/sqrt(sum(goodEEGEyeSubsIdx));
+            errorbar(mean(meanQuantCPLRsEEGEye(goodEEGEyeSubsIdx,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+            hold on
+            errorbar(mean(meanQuantOBLRsEEGEye(goodEEGEyeSubsIdx,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+            xlim([0,numQuant+1])
+            ylim(lLims);
+            yticks(lLims) 
+            xticks(1:numQuant)
+            xlabel("EEG + Pupil Quantile")
+            ylabel("Good Subs Mean LR")
+            fitCPLR = polyfit(1:numQuant,mean(meanQuantCPLRsEEGEye(goodEEGEyeSubsIdx,:)), 1);
+            fitOBLR = polyfit(1:numQuant,mean(meanQuantOBLRsEEGEye(goodEEGEyeSubsIdx,:)), 1);
+            x = 1:numQuant;
+            yCPLR = polyval(fitCPLR , x);
+            yOBLR = polyval(fitOBLR , x);
+            plot(x,yCPLR,'Color',cpColor)
+            plot(x,yOBLR,'Color',obColor)
+            legend("","","Changepoint","Oddball","Location","east")
+            set(gca, 'box', 'off')
+            set(gca,"FontName","Arial","FontWeight","bold","FontSize",15)
+    
+        subplot(2,3,4)
+        %eeg learning quantiles
+            semCP = std(meanQuantCPLRsEEG(badEEGSubsIdx,:))/sqrt(sum(badEEGSubsIdx));
+            semOB = std(meanQuantOBLRsEEG(badEEGSubsIdx,:))/sqrt(sum(badEEGSubsIdx));
+            errorbar(mean(meanQuantCPLRsEEG(badEEGSubsIdx,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+            hold on
+            errorbar(mean(meanQuantOBLRsEEG(badEEGSubsIdx,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+            xlim([0,numQuant+1])
+            ylim(lLims);
+            yticks(lLims) 
+            xticks(1:numQuant)
+            xlabel("EEG Quantile")
+            ylabel("Bad Subs Mean LR")
+            fitCPLR = polyfit(1:numQuant,mean(meanQuantCPLRsEEG(badEEGSubsIdx,:)), 1);
+            fitOBLR = polyfit(1:numQuant,mean(meanQuantOBLRsEEG(badEEGSubsIdx,:)), 1);
+            x = 1:numQuant;
+            yCPLR = polyval(fitCPLR , x);
+            yOBLR = polyval(fitOBLR , x);
+            plot(x,yCPLR,'Color',cpColor)
+            plot(x,yOBLR,'Color',obColor)
+            set(gca, 'box', 'off')
+            set(gca,"FontName","Arial","FontWeight","bold","FontSize",15)
+    
+        subplot(2,3,5)
+        %pupil learning quantiles
+            semCP = std(meanQuantCPLRsEye(badEyeSubsIdx,:))/sqrt(sum(badEyeSubsIdx));
+            semOB = std(meanQuantOBLRsEye(badEyeSubsIdx,:))/sqrt(sum(badEyeSubsIdx));
+            errorbar(mean(meanQuantCPLRsEye(badEyeSubsIdx,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+            hold on
+            errorbar(mean(meanQuantOBLRsEye(badEyeSubsIdx,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+            xlim([0,numQuant+1])
+            ylim(lLims);
+            yticks(lLims) 
+            xticks(1:numQuant)
+            xlabel("Pupil Quantile")
+            ylabel("Bad Subs Mean LR")
+            fitCPLR = polyfit(1:numQuant,mean(meanQuantCPLRsEye(badEyeSubsIdx,:)), 1);
+            fitOBLR = polyfit(1:numQuant,mean(meanQuantOBLRsEye(badEyeSubsIdx,:)), 1);
+            x = 1:numQuant;
+            yCPLR = polyval(fitCPLR , x);
+            yOBLR = polyval(fitOBLR , x);
+            plot(x,yCPLR,'Color',cpColor)
+            plot(x,yOBLR,'Color',obColor)
+            set(gca, 'box', 'off')
+            set(gca,"FontName","Arial","FontWeight","bold","FontSize",15)
+    
+        subplot(2,3,6)
+        %eeg+pupil learning quantiles
+            semCP = std(meanQuantCPLRsEEGEye(badEEGEyeSubsIdx,:))/sqrt(sum(badEEGEyeSubsIdx));
+            semOB = std(meanQuantOBLRsEEGEye(badEEGEyeSubsIdx,:))/sqrt(sum(badEEGEyeSubsIdx));
+            errorbar(mean(meanQuantCPLRsEEGEye(badEEGEyeSubsIdx,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+            hold on
+            errorbar(mean(meanQuantOBLRsEEGEye(badEEGEyeSubsIdx,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+            xlim([0,numQuant+1])
+            ylim(lLims);
+            yticks(lLims) 
+            xticks(1:numQuant)
+            xlabel("EEG + Pupil Quantile")
+            ylabel("Bad Subs Mean LR")
+            fitCPLR = polyfit(1:numQuant,mean(meanQuantCPLRsEEGEye(badEEGEyeSubsIdx,:)), 1);
+            fitOBLR = polyfit(1:numQuant,mean(meanQuantOBLRsEEGEye(badEEGEyeSubsIdx,:)), 1);
+            x = 1:numQuant;
+            yCPLR = polyval(fitCPLR , x);
+            yOBLR = polyval(fitOBLR , x);
+            plot(x,yCPLR,'Color',cpColor)
+            plot(x,yOBLR,'Color',obColor)
+            legend("","","Changepoint","Oddball","Location","northwest")
+            set(gca, 'box', 'off')
+            set(gca,"FontName","Arial","FontWeight","bold","FontSize",15)
+    
+    %GOOD SUBJECTS
+    % calculate p values of bias/lr cp/ob slopes for eeg ...
+    [~,goodpLRCPEEG] = ttest(LRCPslopeEEG(goodEEGSubsIdx,2));
+    [~,goodpLROBEEG] = ttest(LROBslopeEEG(goodEEGSubsIdx,2));
+    [~,goodpLRDiffEEG,~,goodDiffStatsEEG] = ttest(LRCPslopeEEG(goodEEGSubsIdx,2)-LROBslopeEEG(goodEEGSubsIdx,2));
+    
+    % ... eye data ...
+    [~,goodpLRCPEye] = ttest(LRCPslopeEye(goodEyeSubsIdx,2));
+    [~,goodpLROBEye] = ttest(LROBslopeEye(goodEyeSubsIdx,2));
+    [~,goodpLRDiffEye,~,goodDiffStatsEye] = ttest(LRCPslopeEye(goodEyeSubsIdx,2)-LROBslopeEye(goodEyeSubsIdx,2));
+    
+    % ... and both forms of data combined
+    [~,goodpLRCPEEGEye] = ttest(LRCPslopeEEGEye(goodEEGEyeSubsIdx,2));
+    [~,goodpLROBEEGEye] = ttest(LROBslopeEEGEye(goodEEGEyeSubsIdx,2));
+    [~,goodpLRDiffEEGEye,~,goodDiffStatsEEGEye] = ttest(LRCPslopeEEGEye(goodEEGEyeSubsIdx,2)-LROBslopeEEGEye(goodEEGEyeSubsIdx,2));
+    
+    %BAD SUBJECTS
+    % calculate p values of bias/lr cp/ob slopes for eeg ...
+    [~,badpLRCPEEG] = ttest(LRCPslopeEEG(badEEGSubsIdx,2));
+    [~,badpLROBEEG] = ttest(LROBslopeEEG(badEEGSubsIdx,2));
+    [~,badpLRDiffEEG,~,badDiffStatsEEG] = ttest(LRCPslopeEEG(badEEGSubsIdx,2)-LROBslopeEEG(badEEGSubsIdx,2));
+    
+    % ... eye data ...
+    [~,badpLRCPEye] = ttest(LRCPslopeEye(badEyeSubsIdx,2));
+    [~,badpLROBEye] = ttest(LROBslopeEye(badEyeSubsIdx,2));
+    [~,badpLRDiffEye,~,badDiffStatsEye] = ttest(LRCPslopeEye(badEyeSubsIdx,2)-LROBslopeEye(badEyeSubsIdx,2));
+    
+    % ... and both forms of data combined
+    [~,badpLRCPEEGEye] = ttest(LRCPslopeEEGEye(badEEGEyeSubsIdx,2));
+    [~,badpLROBEEGEye] = ttest(LROBslopeEEGEye(badEEGEyeSubsIdx,2));
+    [~,badpLRDiffEEGEye,~,badDiffStatsEEGEye] = ttest(LRCPslopeEEGEye(badEEGEyeSubsIdx,2)-LROBslopeEEGEye(badEEGEyeSubsIdx,2));
+    % Save as supp figure
+    if doSTPResiduals == 0
+        fig = gcf;
+        figName = append("Figure_S6_",figTime,'.eps');
+        figLoc = append(figDir,figName);
+        exportgraphics(fig,figLoc,'BackgroundColor','none','ContentType','vector')
+        figName = append("Figure_S6_",figTime,'.png');
+        figLoc = append(figDir,figName);
+        saveas(fig,figLoc)
+    else
+        fig = gcf;
+        figName = append("Figure_S6_Residual_",figTime,'.eps');
+        figLoc = append(figDir,figName);
+        exportgraphics(fig,figLoc,'BackgroundColor','none','ContentType','vector')
+        figName = append("Figure_S6_Residual",figTime,'.png');
+        figLoc = append(figDir,figName);
+        saveas(fig,figLoc)
+    end
+end
+% 
+ %%
+% figure("Position",[100,100,1200,400])
+% subplot(1,3,1)
+% % eeg bias quantiles
+%     semCP = std(meanQuantCPBiasEEG(:,:))/sqrt(length(EEGSubs));
+%     semOB = std(meanQuantOBBiasEEG(:,:))/sqrt(length(EEGSubs));
+%     errorbar(mean(meanQuantCPBiasEEG(:,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+%     hold on
+%     errorbar(mean(meanQuantOBBiasEEG(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+%     xlim([0,numQuant+1])
+%     ylim([0.3,0.45]);
+%     yticks([0.3,0.45]) 
+%     xticks(1:numQuant)
+%     xlabel("EEG Quantile")
+%     ylabel("Mean Bias")
+%     fitCPBias = polyfit(1:numQuant,mean(meanQuantCPBiasEEG), 1);
+%     fitOBBias = polyfit(1:numQuant,mean(meanQuantOBBiasEEG), 1);
+%     x = 1:numQuant;
+%     yCPBias = polyval(fitCPBias , x);
+%     yOBBias = polyval(fitOBBias , x);
+%     plot(x,yCPBias,'Color',cpColor)
+%     plot(x,yOBBias,'Color',obColor)
+%     set(gca, 'box', 'off')
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)
+% 
+% subplot(1,3,2)
+% % pupil bias quantiles
+%     semCP = std(meanQuantCPBiasEye(:,:))/sqrt(length(eyeSubs));
+%     semOB = std(meanQuantOBBiasEye(:,:))/sqrt(length(eyeSubs));
+%     errorbar(mean(meanQuantCPBiasEye(:,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+%     hold on
+%     errorbar(mean(meanQuantOBBiasEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+%     xlim([0,numQuant+1])
+%     ylim([0.3,0.45]);
+%     yticks([0.3,0.45]) 
+%     xticks(1:numQuant)
+%     xlabel("Pupil Quantile")
+%     ylabel("Mean Bias")
+%     fitCPBias = polyfit(1:numQuant,mean(meanQuantCPBiasEye), 1);
+%     fitOBBias = polyfit(1:numQuant,mean(meanQuantOBBiasEye), 1);
+%     x = 1:numQuant;
+%     yCPBias = polyval(fitCPBias , x);
+%     yOBBias = polyval(fitOBBias , x);
+%     plot(x,yCPBias,'Color',cpColor)
+%     plot(x,yOBBias,'Color',obColor)
+%     set(gca, 'box', 'off')
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)
+% 
+% subplot(1,3,3)
+% % eeg+pupil bias quantiles
+%     semCP = std(meanQuantCPBiasEEGEye(:,:))/sqrt(eegEyeNumSubs);
+%     semOB = std(meanQuantOBBiasEEGEye(:,:))/sqrt(eegEyeNumSubs);
+%     errorbar(mean(meanQuantCPBiasEEGEye(:,:)),semCP,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",cpColor,"CapSize",0,"Color",cpColor,"MarkerEdgeColor",cpColor)
+%     hold on
+%     errorbar(mean(meanQuantOBBiasEEGEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
+%     xlim([0,numQuant+1])
+%     ylim([0.3,0.45]);
+%     yticks([0.3,0.45]) 
+%     xticks(1:numQuant)
+%     xlabel("EEG + Pupil Quantile")
+%     ylabel("Mean Bias")
+%     fitCPBias = polyfit(1:numQuant,mean(meanQuantCPBiasEEGEye), 1);
+%     fitOBBias = polyfit(1:numQuant,mean(meanQuantOBBiasEEGEye), 1);
+%     x = 1:numQuant;
+%     yCPBias = polyval(fitCPBias , x);
+%     yOBBias = polyval(fitOBBias , x);
+%     plot(x,yCPBias,'Color',cpColor)
+%     plot(x,yOBBias,'Color',obColor)
+%     legend("","","Changepoint","Oddball")
+%     set(gca, 'box', 'off')
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",18)
+%%
+% mat1=b_mat_eeg(:,[13],:,:); %Pz
+% mat2=reshape(mean(mean(mat1,2),1),4000,[]); 
+% mat3 = mat2';
+% mat4 = reshape(mean(mat1,2),size(b_mat_eeg,[1,3,4]));
+% 
+% figure
+% subplot(2,1,1)
+% sem = std(mat4(:,:,1))./sqrt(size(b_mat_eeg,1)-1);
+% shadedErrorBar(-1999:2000,mat3(1,:),[mat3(1,:)-sem;mat3(1,:)+sem])
+%     yline(0,'--')
+%     xlim([-500,2000])
+%     xticks([])
+%     ylabel("Intercept")
+%     title("Pz (Original Model)")
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+%     set(gca, 'box', 'off')
+% 
+% 
+% subplot(2,1,2)
+% sem = std(mat4(:,:,2))./sqrt(size(b_mat_eeg,1)-1);
+% shadedErrorBar(-1999:2000,mat3(2,:),[mat3(2,:)-sem;mat3(2,:)+sem])
+%     yline(0,'--')
+%     xlim([-500,2000])
+%     xlabel("Time (ms)")
+%     ylabel("STP")
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+%     set(gca, 'box', 'off')
+% 
+% 
+% mat1=b_mat_eeg(:,[63],:,:); %FCz
+% mat2=reshape(mean(mean(mat1,2),1),4000,[]); 
+% mat3 = mat2';
+% mat4 = reshape(mean(mat1,2),size(b_mat_eeg,[1,3,4]));
+% 
+% figure
+% subplot(2,1,1)
+% sem = std(mat4(:,:,1))./sqrt(size(b_mat_eeg,1)-1);
+% shadedErrorBar(-1999:2000,mat3(1,:),[mat3(1,:)-sem;mat3(1,:)+sem])
+%     yline(0,'--')
+%     xlim([-500,2000])
+%     xticks([])
+%     ylabel("Intercept")
+%     title("FCz (Original Model)")
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+%     set(gca, 'box', 'off')
+% 
+% subplot(2,1,2)
+% sem = std(mat4(:,:,2))./sqrt(size(b_mat_eeg,1)-1);
+% shadedErrorBar(-1999:2000,mat3(2,:),[mat3(2,:)-sem;mat3(2,:)+sem])
+%     yline(0,'--')
+%     xlim([-500,2000])
+%     xlabel("Time (ms)")
+%     ylabel("STP")
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+%     set(gca, 'box', 'off')
+% 
+% figure
+% subplot(2,1,1)
+% sem = std(allBsPerm(:,:,1))./sqrt(size(allBsPerm,1)-1);
+% coefs = squeeze(mean(allBsPerm))';
+% shadedErrorBar(-timeBeforeEye:timeAfterEye,coefs(1,:),[coefs(1,:)-sem;coefs(1,:)+sem])
+%     yline(0,'--')
+%     xlim([-1000,4000])
+%     xticks([])
+%     ylabel("Intercept")
+%     title("Pupil (Original Model)")
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+%     set(gca, 'box', 'off')
+% subplot(2,1,2)
+% sem = std(allBsPerm(:,:,2))./sqrt(size(allBsPerm,1)-1);
+% shadedErrorBar(-timeBeforeEye:timeAfterEye,coefs(2,:),[coefs(2,:)-sem;coefs(2,:)+sem])
+%     yline(0,'--')
+%     xlim([-1000,4000])
+%     xlabel("Time (ms)")
+%     ylabel("STP")
+%     set(gca,"FontName","Arial","FontWeight","bold","FontSize",14)
+%     set(gca, 'box', 'off')
+
+
+
+
+    

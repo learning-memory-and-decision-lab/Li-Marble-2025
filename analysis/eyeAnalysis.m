@@ -283,14 +283,13 @@ if size(dataEye,2) == 5
     dataEye(:,6:8) = 0;
     dataEye(:,8) = dataEye(:,5);
     dataEye(:,5:7) = dataEye(:,2:4);
-    
 end
 %% Removing bad eye from eye data with bad eye
 subno = str2double(subNum);
-if ismember(subno,[2030,2063,3014])
+if ismember(subno,[2030,2063,3014,4002,4021,4024])
     dataEye(:,2:4)=dataEye(:,5:7);
 end
-if ismember(subno,[2035,2057,2058,2062,2071,2083,2087,2098,2101,2103,2106,3018])
+if ismember(subno,[2035,2057,2058,2062,2071,2083,2087,2098,2101,2103,2106,3018,4022])
     dataEye(:,5:7)=dataEye(:,2:4);
 end
 %% Finding start of each block
@@ -302,7 +301,7 @@ blockNumber = 1;
 previous = blocks(1);
 place = 1;
 for i = 1:size(blocks, 1)
-    if blocks(i) - previous ~= 1 || i == 1
+    if blocks(i) - previous > 5 || i == 1
         blockChange(place) = blocks(i);
         place = place + 1;
     end
@@ -469,9 +468,9 @@ for t=1:length(blinks)
     
 end
 
-[value,indices] = fillmissing(dataEye(:,4),'linear');
+[value,indices] = fillmissing(dataEye(:,4),'linear', 'EndValues', 'nearest');
 dataEye(indices,4)=value(indices);
-[value,indices] = fillmissing(dataEye(:,7),'linear');
+[value,indices] = fillmissing(dataEye(:,7),'linear', 'EndValues', 'nearest');
 dataEye(indices,7)=value(indices);
 
 meanArea=(dataEye(:,4)+dataEye(:,7))/2;
@@ -802,9 +801,9 @@ zDiam=nanzscore(diameterMat);
     gazeRxDat(gazeRxDat==0)=NaN;
     gazeRyDat(gazeRyDat==0)=NaN;
     
-    [value,indices] = fillmissing(gazeRxDat(:,1),'linear');
+    [value,indices] = fillmissing(gazeRxDat(:,1),'linear', 'EndValues', 'nearest');
     gazeRxDat(indices,1)=value(indices);
-    [value,indices] = fillmissing(gazeRyDat(:,1),'linear');
+    [value,indices] = fillmissing(gazeRyDat(:,1),'linear', 'EndValues', 'nearest');
     gazeRyDat(indices,1)=value(indices);
     
     gazeRxMat = reshape(gazeRxDat, [stimSize, 2*nTrials]);
@@ -819,9 +818,9 @@ zDiam=nanzscore(diameterMat);
     gazeLxDat(gazeLxDat==0)=NaN;
     gazeLyDat(gazeLyDat==0)=NaN;
     
-    [value,indices] = fillmissing(gazeLxDat(:,1),'linear');
+    [value,indices] = fillmissing(gazeLxDat(:,1),'linear', 'EndValues', 'nearest');
     gazeLxDat(indices,1)=value(indices);
-    [value,indices] = fillmissing(gazeLyDat(:,1),'linear');
+    [value,indices] = fillmissing(gazeLyDat(:,1),'linear', 'EndValues', 'nearest');
     gazeLyDat(indices,1)=value(indices);
     
     gazeLxMat = reshape(gazeLxDat, [stimSize, 2*nTrials]);
@@ -835,12 +834,12 @@ zDiam=nanzscore(diameterMat);
     
     
     
-    %% check attentional bias during stim presentation (0-500ms)
+    %% check attentional bias during stim presentation (0-200ms)
     
     %in these matrices, row stimBefore is stim start
     %stim end is at stimBefore+500
-    gazeLRxStimOn = gazeLRxMat(stimBefore:stimBefore+500-1,:);
-    gazeLRyStimOn = gazeLRyMat(stimBefore:stimBefore+500-1,:);
+    gazeLRxStimOn = gazeLRxMat(stimBefore:stimBefore+200-1,:);
+    gazeLRyStimOn = gazeLRyMat(stimBefore:stimBefore+200-1,:);
     
     
     % gazeLxStimOn = mean(gazeLxMat(stimBefore:stimBefore+500-1,:),1);
