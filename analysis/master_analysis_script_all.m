@@ -3511,8 +3511,10 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBBiasEEG(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim([0.2,0.35]);
-        yticks([0.2,0.35]) 
+        if realData == 1
+            ylim([0.2,0.35]);
+            yticks([0.2,0.35]) 
+        end
         xticks(1:numQuant)
         xlabel("EEG Quantile")
         ylabel("Mean Bias")
@@ -3534,8 +3536,10 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBBiasEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim([0.2,0.35]);
-        yticks([0.2,0.35]) 
+        if realData == 1
+            ylim([0.2,0.35]);
+            yticks([0.2,0.35])
+        end
         xticks(1:numQuant)
         xlabel("Pupil Quantile")
         ylabel("Mean Bias")
@@ -3557,8 +3561,10 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBBiasEEGEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim([0.2,0.35]);
-        yticks([0.2,0.35]) 
+        if realData == 1
+            ylim([0.2,0.35]);
+            yticks([0.2,0.35]) 
+        end
         xticks(1:numQuant)
         xlabel("EEG + Pupil Quantile")
         ylabel("Mean Bias")
@@ -3703,8 +3709,10 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBLRsEEG(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim(lLims);
-        yticks(lLims) 
+        if realData == 1
+            ylim(lLims);
+            yticks(lLims) 
+        end
         xticks(1:numQuant)
         xlabel("EEG Quantile")
         ylabel("Mean LR")
@@ -3726,8 +3734,10 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBLRsEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim(lLims);
-        yticks(lLims) 
+        if realData == 1
+            ylim(lLims);
+            yticks(lLims) 
+        end        
         xticks(1:numQuant)
         xlabel("Pupil Quantile")
         ylabel("Mean LR")
@@ -3749,8 +3759,10 @@ if ~isempty(gSig)
         hold on
         errorbar(mean(meanQuantOBLRsEEGEye(:,:)),semOB,'LineStyle','none','LineWidth',1,'Marker','o',"MarkerFaceColor",obColor,"CapSize",0,"Color",obColor,"MarkerEdgeColor",obColor)
         xlim([0,numQuant+1])
-        ylim(lLims);
-        yticks(lLims) 
+        if realData == 1
+            ylim(lLims);
+            yticks(lLims) 
+        end        
         xticks(1:numQuant)
         xlabel("EEG + Pupil Quantile")
         ylabel("Mean LR")
